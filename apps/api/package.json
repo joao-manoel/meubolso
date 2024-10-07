@@ -6,11 +6,11 @@
     "env:load": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@cro/auth": "workspace:*",
+    "@cro/env": "workspace:*",
     "@fastify/cors": "^9.0.1",
     "@fastify/jwt": "^8.0.1",
     "@prisma/client": "5.16.2",
-    "@cro/auth": "workspace:*",
-    "@cro/env": "workspace:*",
     "clsx": "^2.1.1",
     "fastify": "^4.28.1",
     "fastify-plugin": "^4.5.1",
@@ -21,6 +21,7 @@
     "raw-body": "^3.0.0",
     "stripe": "^16.7.0",
     "tailwindcss-animate": "^1.0.7",
+    "tsup": "^8.3.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
