@@ -1,0 +1,4 @@
+{
+  "extends": "@cro/tsconfig/library.json",
+  "include": ["src/**/*"]
+}
