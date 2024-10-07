@@ -1,0 +1,169 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountProvider {
+  GITHUB
+}
+
+enum WalletType {
+  PERSONAL
+  ORGANIZATIONAL
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum TokenType {
+  PASSWORD_RECOVER
+}
+
+enum SubscriptionType {
+  NONE
+  ACTIVE
+  CANCELLED
+}
+
+model User {
+  id           String           @id @default(uuid())
+  name         String
+  email        String           @unique
+  passwordHash String?          @map("password_hash")
+  avatarUrl    String?          @map("avatar_url")
+  subscription SubscriptionType @default(NONE)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  Wallet       Wallet[]
+  Account      Account[]
+  Organization Organization[]
+  Member       Member[]
+  Invite       Invite[]
+  Token        Token[]
+
+  @@map("users")
+}
+
+model Token {
+  id        String    @id @default(uuid())
+  type      TokenType
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  @@map("tokens")
+}
+
+model Account {
+  id                String          @id @default(uuid())
+  provider          AccountProvider
+  providerAccountId String          @unique @map("provider_account_id")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  @@unique([provider, userId])
+  @@map("accounts")
+}
+
+model Invite {
+  id        String       @id @default(uuid())
+  email     String
+  role      Role
+  status    InviteStatus @default(PENDING)
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId String? @map("author_id")
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String       @map("organization_id")
+
+  @@unique([email, organizationId])
+  @@index([email])
+  @@map("invites")
+}
+
+model Member {
+  id   String @id @default(uuid())
+  role Role   @default(MEMBER)
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String       @map("organization_id")
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @map("user_id")
+
+  @@unique([organizationId, userId])
+  @@map("members")
+}
+
+model Organization {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String
+  avatarUrl String?  @map("avatar_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  owner   User     @relation(fields: [ownerId], references: [id])
+  ownerId String   @map("owner_id")
+  Member  Member[]
+  Invite  Invite[]
+  Wallet  Wallet[]
+
+  @@map("organizations")
+}
+
+model Wallet {
+  id        String     @id @default(uuid())
+  name      String
+  type      WalletType
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  owner   User?  @relation(fields: [ownerId], references: [id])
+  ownerId String @map("owner_id")
+
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?       @map("organization_id")
+
+  Transaction Transaction[]
+
+  @@map("wallets")
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  description String
+  amount      Int
+  type        TransactionType
+  startDate   DateTime        @map("start_date")
+  endDate     DateTime        @map("end_date")
+
+  wallet   Wallet @relation(fields: [walletId], references: [id])
+  walletId String @map("wallet_id")
+
+  @@map("transactions")
+}
