@@ -3,9 +3,12 @@ version: '3.7'
 services:
   pg:
     image: bitnami/postgresql:latest
+    container_name: cronota
     ports:
       - '5432:5432'
     environment:
       - POSTGRES_USER=docker
       - POSTGRES_PASSWORD=cronota
       - POSTGRES_DB=cronota  
+
+name: cronota
