@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #333; /* Cor do scrollbar (cinza-600) */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #111; /* Cor do track (cinza-100) */
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
 }

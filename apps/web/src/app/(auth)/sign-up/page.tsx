@@ -32,9 +32,14 @@ export default function SignUpPage() {
       <div className="z-50 flex w-full justify-center lg:justify-end">
         <div className="flex max-h-[800px] w-full max-w-md flex-col space-y-4 overflow-x-auto rounded-lg bg-zinc-900 p-4 shadow-lg lg:h-screen lg:bg-black">
           <h1 className="mb-8 mt-16 text-2xl font-bold text-gray-200 max-md:mb-8 max-md:mt-12">
-            Acesse sua conta
+            Cadastre-se gratuitamente
           </h1>
           <form action="" className="w-full space-y-4">
+            <div className="w-full space-y-1">
+              <Label htmlFor="name">Nome completo</Label>
+              <Input name="name" type="text" id="name" placeholder="Seu nome" />
+            </div>
+
             <div className="w-full space-y-1">
               <Label htmlFor="email">E-mail</Label>
               <Input
@@ -53,13 +58,16 @@ export default function SignUpPage() {
                 id="password"
                 placeholder="Sua senha"
               />
+            </div>
 
-              <Link
-                href="/auth/forgot-password"
-                className="text-xs font-medium text-foreground text-zinc-300 hover:underline"
-              >
-                Esqueceu sua senha?
-              </Link>
+            <div className="space-y-1">
+              <Label htmlFor="confirm_password">Confirme sua senha</Label>
+              <Input
+                name="confirm_password"
+                type="password"
+                id="confirm_password"
+                placeholder="Confirme sua senha"
+              />
             </div>
 
             <Button
@@ -68,7 +76,7 @@ export default function SignUpPage() {
             >
               <div className="flex flex-1 items-center justify-center gap-2">
                 <span className="AuiButton-label px-1 text-base leading-6">
-                  Entrar
+                  Cadastre-se gratuitamente
                 </span>
               </div>
             </Button>
@@ -99,13 +107,13 @@ export default function SignUpPage() {
             </Button>
           </form>
           <Separator />
-          <Link href="/sign-up">
+          <Link href="/sign-in">
             <div className="flex w-full gap-4 rounded-md border border-gray-600 bg-zinc-900 px-6 py-4 transition hover:brightness-125">
               <UserRoundPlus className="size-5 text-orange-400" />
               <div className="flex flex-col text-gray-200">
-                Não tem uma conta?
+                Já tem uma conta?
                 <span className="font-medium text-orange-400">
-                  Se cadastre-se gratuitamente!
+                  Acessar plataforma!
                 </span>
               </div>
               <ChevronRight className="ml-auto size-4 self-center text-gray-400" />
