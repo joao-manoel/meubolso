@@ -8,6 +8,7 @@ import {
   ZodTypeProvider,
 } from 'fastify-type-provider-zod'
 
+import { authenticateWithGoogle } from './routes/auth/authenticate-with-google'
 import { createAccount } from './routes/auth/create-account'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -22,7 +23,7 @@ app.setValidatorCompiler(validatorCompiler)
 app.register(fastifyCors)
 
 app.register(createAccount)
-
+app.register(authenticateWithGoogle)
 app.listen({ port: env.SERVER_PORT }).then(() => {
   console.log(`🔥 Server listening on ${env.SERVER_PORT}`)
 })
