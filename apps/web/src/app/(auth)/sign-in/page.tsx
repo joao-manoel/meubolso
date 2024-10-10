@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import googleIcon from '@/assets/google-icon.svg'
+import FloatingLabelInput from '@/components/FloatingLabelInput'
 import GridPattern from '@/components/ui/animated-grid-pattern'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -30,28 +31,20 @@ export default function SignUpPage() {
         />
       </div>
       <div className="z-50 flex w-full justify-center lg:justify-end">
-        <div className="flex max-h-[800px] w-full max-w-md flex-col space-y-4 overflow-x-auto rounded-lg bg-zinc-900 p-4 shadow-lg lg:h-screen lg:bg-black">
+        <div className="flex max-h-[800px] w-full max-w-md flex-col space-y-4 overflow-x-auto rounded-lg bg-zinc-900 p-4 shadow-lg lg:h-screen lg:max-h-screen lg:rounded-none lg:bg-zinc-900">
           <h1 className="mb-8 mt-16 text-2xl font-bold text-gray-200 max-md:mb-8 max-md:mt-12">
             Acesse sua conta
           </h1>
-          <form action="" className="w-full space-y-4">
+          <form action="" className="w-full space-y-8">
             <div className="w-full space-y-1">
-              <Label htmlFor="email">E-mail</Label>
-              <Input
-                name="email"
-                type="email"
-                id="email"
-                placeholder="Seu e-mail"
-              />
+              <FloatingLabelInput label="Seu email" name="email" type="email" />
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="email">Senha</Label>
-              <Input
+              <FloatingLabelInput
+                label="Sua senha"
                 name="password"
                 type="password"
-                id="password"
-                placeholder="Sua senha"
               />
 
               <Link

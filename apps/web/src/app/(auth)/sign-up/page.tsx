@@ -30,7 +30,7 @@ export default function SignUpPage() {
         />
       </div>
       <div className="z-50 flex w-full justify-center lg:justify-end">
-        <div className="flex max-h-[800px] w-full max-w-md flex-col space-y-4 overflow-x-auto rounded-lg bg-zinc-900 p-4 shadow-lg lg:h-screen lg:bg-black">
+        <div className="flex max-h-[800px] w-full max-w-md flex-col space-y-4 overflow-x-auto rounded-lg bg-zinc-900 p-4 shadow-lg lg:h-screen lg:max-h-screen lg:rounded-none lg:bg-zinc-900">
           <h1 className="mb-8 mt-16 text-2xl font-bold text-gray-200 max-md:mb-8 max-md:mt-12">
             Cadastre-se gratuitamente
           </h1>
