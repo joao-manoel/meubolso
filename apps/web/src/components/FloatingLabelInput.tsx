@@ -19,11 +19,9 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   const [value, setValue] = useState<string>(props.value?.toString() || '')
   const [isFocused, setIsFocused] = useState(false)
 
-  // Gera um id único para o input caso não seja passado via props
   const inputId =
     id || `floating-input-${Math.random().toString(36).substring(2, 9)}`
 
-  // Verifica se o input já possui um valor inicial para ajustar o label
   useEffect(() => {
     if (props.value) {
       setValue(props.value.toString())
@@ -34,7 +32,6 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   const handleFocus = () => setIsFocused(true)
 
   const handleBlur = () => {
-    // Verifica se o valor é string antes de chamar trim()
     if (typeof value === 'string' && value.trim() === '') {
       setIsFocused(false)
     }
@@ -46,7 +43,6 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
 
   return (
     <div className="relative">
-      {/* Atribui o id ao input */}
       <Input
         id={inputId}
         className={cn(
@@ -60,7 +56,6 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
         value={value}
         {...props}
       />
-      {/* Define htmlFor para associar o label ao input */}
       <label
         htmlFor={inputId}
         className={cn(
