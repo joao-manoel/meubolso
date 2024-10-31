@@ -25,7 +25,9 @@ export async function DashboardSidebarHeader() {
                 size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-orange-500 text-sidebar-primary-foreground"></div>
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-orange-400 text-sidebar-primary-foreground">
+                  C
+                </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">Cronota</span>
                   <span className="truncate text-xs">

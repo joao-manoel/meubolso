@@ -15,7 +15,7 @@ import { signInWithGoogleAction } from '../action'
 export default function SignUpPage() {
   return (
     <div className="flex h-screen flex-col items-center justify-center p-10 lg:grid lg:grid-cols-[70%_30%] lg:p-0">
-      <div className="z-10 overflow-hidden bg-black lg:block">
+      <div className="z-10 overflow-hidden bg-white dark:bg-black lg:block">
         <GridPattern
           numSquares={30}
           maxOpacity={0.1}
@@ -29,8 +29,8 @@ export default function SignUpPage() {
         />
       </div>
       <div className="z-50 flex w-full justify-center lg:justify-end">
-        <div className="flex max-h-[800px] w-full max-w-md flex-col space-y-4 overflow-x-auto rounded-lg bg-zinc-900 p-4 shadow-lg lg:h-screen lg:max-h-screen lg:rounded-none lg:bg-zinc-900">
-          <h1 className="mb-8 mt-16 text-2xl font-bold text-gray-200 max-md:mb-8 max-md:mt-12">
+        <div className="flex max-h-[800px] w-full max-w-md flex-col space-y-4 overflow-x-auto rounded-lg bg-white p-4 shadow-lg dark:bg-zinc-900 lg:h-screen lg:max-h-screen lg:rounded-none lg:bg-white lg:dark:bg-zinc-900">
+          <h1 className="mb-8 mt-16 text-2xl font-bold text-gray-800 dark:text-gray-200 max-md:mb-8 max-md:mt-12">
             Acesse sua conta
           </h1>
           <form action="" className="w-full space-y-8">
@@ -47,7 +47,7 @@ export default function SignUpPage() {
 
               <Link
                 href="/auth/forgot-password"
-                className="text-xs font-medium text-foreground text-zinc-300 hover:underline"
+                className="text-xs font-medium text-foreground text-zinc-500 hover:underline dark:text-zinc-300"
               >
                 Esqueceu sua senha?
               </Link>
@@ -69,7 +69,7 @@ export default function SignUpPage() {
             action={signInWithGoogleAction}
             className="mt-5 flex w-full items-center gap-6 pt-8 max-md:mt-12 max-sm:flex-col max-sm:items-start max-sm:gap-2 lg:mt-16"
           >
-            <span className="relative z-10 flex w-full justify-center whitespace-nowrap text-center text-gray-200">
+            <span className="relative z-10 flex w-full justify-center whitespace-nowrap text-center text-gray-500 dark:text-gray-200">
               <i className="absolute top-[12px] block h-[1px] w-full bg-zinc-950 sm:hidden" />
               <p className="z-20 w-fit bg-zinc-900 pl-2 pr-2 lg:bg-transparent">
                 Ou se preferir
@@ -91,9 +91,9 @@ export default function SignUpPage() {
           </form>
           <Separator />
           <Link href="/sign-up">
-            <div className="flex w-full gap-4 rounded-md border border-gray-600 bg-zinc-900 px-6 py-4 transition hover:brightness-125">
+            <div className="flex w-full gap-4 rounded-md border border-gray-200 bg-[#f2f2f2] px-6 py-4 transition hover:brightness-75 dark:bg-zinc-900">
               <UserRoundPlus className="size-5 text-orange-400" />
-              <div className="flex flex-col text-gray-200">
+              <div className="flex flex-col dark:text-gray-200">
                 Não tem uma conta?
                 <span className="font-medium text-orange-400">
                   Se cadastre-se gratuitamente!

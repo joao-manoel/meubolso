@@ -59,7 +59,7 @@ export default function CreateWalletForm({
             )}
             {(subscription === 'NONE' || subscription === 'CANCELLED') && (
               <div className="flex flex-col space-y-1.5">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-center text-sm text-muted-foreground">
                   Faça upgrade para criar carteiras organizacionais.
                 </p>
                 <Button variant="outline">🎇 Fazer Upgrade</Button>
