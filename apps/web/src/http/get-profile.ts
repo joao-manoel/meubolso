@@ -1,10 +1,13 @@
 import { api } from './api-client'
 
+export type SubscriptionType = 'NONE' | 'ACTIVE' | 'CANCELLED'
+
 interface GetProfileResponse {
   user: {
     id: number
     name: string
     email?: string | null
+    subscription: SubscriptionType
   }
 }
 

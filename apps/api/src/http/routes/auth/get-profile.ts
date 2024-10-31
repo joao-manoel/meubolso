@@ -1,3 +1,4 @@
+import { SubscriptionType } from '@prisma/client'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -23,6 +24,7 @@ export async function getProfile(app: FastifyInstance) {
                 id: z.string(),
                 name: z.string().nullable(),
                 email: z.string().email().nullable(),
+                subscription: z.nativeEnum(SubscriptionType),
               }),
             }),
           },
@@ -36,6 +38,7 @@ export async function getProfile(app: FastifyInstance) {
             id: true,
             name: true,
             email: true,
+            subscription: true,
           },
           where: {
             id: userId,
@@ -51,6 +54,7 @@ export async function getProfile(app: FastifyInstance) {
             id: user.id,
             name: user.name,
             email: user.email,
+            subscription: user.subscription,
           },
         })
       },

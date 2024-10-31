@@ -1,19 +1,27 @@
-import { Sidebar, SidebarContent, SidebarGroup } from '@/components/ui/sidebar'
+import * as React from 'react'
 
-import { DashboardGroupMenu } from './dashboard-group-menu'
-import { SidebarFooter } from './sidebar-footer'
-import { SidebarHeader } from './sidebar-header'
+import {
+  Sidebar as Nav,
+  SidebarContent,
+  SidebarRail,
+} from '@/components/ui/sidebar'
 
-export function AppSidebar() {
+import { DashboardNav } from './dashboard-nav'
+import { DashboardSidebarFooter } from './dashboard-sidebar-footer'
+import { DashboardSidebarHeader } from './dashboard-sidebar-header'
+import { FinancialNav } from './financial-nav'
+// This is sample data.
+
+export default function Sidebar() {
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader />
+    <Nav collapsible="icon">
+      <DashboardSidebarHeader />
       <SidebarContent>
-        <SidebarGroup>
-          <DashboardGroupMenu />
-        </SidebarGroup>
+        <DashboardNav />
+        <FinancialNav />
       </SidebarContent>
-      <SidebarFooter />
-    </Sidebar>
+      <DashboardSidebarFooter />
+      <SidebarRail />
+    </Nav>
   )
 }
