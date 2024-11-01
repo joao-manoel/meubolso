@@ -22,6 +22,7 @@ export async function getWallets(app: FastifyInstance) {
               z.object({
                 id: z.string(),
                 name: z.string(),
+                slug: z.string(),
                 type: z.nativeEnum(WalletType),
               }),
             ),
@@ -35,6 +36,7 @@ export async function getWallets(app: FastifyInstance) {
           select: {
             id: true,
             name: true,
+            slug: true,
             type: true,
           },
           where: {

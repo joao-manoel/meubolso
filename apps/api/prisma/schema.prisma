@@ -139,7 +139,8 @@ model Organization {
 model Wallet {
   id        String     @id @default(uuid())
   name      String
-  type      WalletType
+  slug      String     @default("null")
+  type      WalletType @default(PERSONAL)
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime   @updatedAt @map("updated_at")
 

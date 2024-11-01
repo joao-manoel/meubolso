@@ -6,11 +6,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-import { getWallets } from '@/http/get-wallets'
+import { GetWalletsResponse } from '@/http/get-wallets'
 
-export async function SelectWallet() {
-  const wallets = await getWallets()
+interface WalletSwitcherProps {
+  wallets: GetWalletsResponse[]
+}
 
+export async function WalletSwitcher({ wallets }: WalletSwitcherProps) {
   const personalWallets = wallets.filter((wallet) => wallet.type === 'PERSONAL')
 
   const organizationWallets = wallets.filter(
@@ -32,9 +34,10 @@ export async function SelectWallet() {
       {personalWallets.map((wallet) => (
         <DropdownMenuItem
           key={wallet.name}
-          className="cursor-pointer gap-2 p-2"
+          className="line-clamp-1 cursor-pointer gap-2 p-2"
+          asChild
         >
-          {wallet.name}
+          <a href={`/dashboard/wallet/${wallet.slug}`}>{wallet.name}</a>
         </DropdownMenuItem>
       ))}
       {personalWallets?.length > 0 && <DropdownMenuSeparator />}
@@ -47,9 +50,10 @@ export async function SelectWallet() {
       {organizationWallets.map((wallet) => (
         <DropdownMenuItem
           key={wallet.name}
-          className="cursor-pointer gap-2 p-2"
+          className="line-clamp-1 cursor-pointer gap-2 p-2"
+          asChild
         >
-          {wallet.name}
+          <a href={`/dashboard/wallet/${wallet.slug}`}>{wallet.name}</a>
         </DropdownMenuItem>
       ))}
       {organizationWallets?.length > 0 && <DropdownMenuSeparator />}

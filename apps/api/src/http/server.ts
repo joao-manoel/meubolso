@@ -11,6 +11,7 @@ import {
 import { authenticateWithGoogle } from './routes/auth/authenticate-with-google'
 import { createAccount } from './routes/auth/create-account'
 import { getProfile } from './routes/auth/get-profile'
+import { createWallet } from './routes/financial/create-wallet'
 import { getWallets } from './routes/financial/get-wallets'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -29,6 +30,7 @@ app.register(authenticateWithGoogle)
 app.register(getProfile)
 
 app.register(getWallets)
+app.register(createWallet)
 
 app.listen({ port: env.SERVER_PORT }).then(() => {
   console.log(`🔥 Server listening on ${env.SERVER_PORT}`)

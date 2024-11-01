@@ -1,5 +1,6 @@
 'use server'
 import { ChevronsUpDown } from 'lucide-react'
+import { cookies } from 'next/headers'
 
 import {
   DropdownMenu,
@@ -11,10 +12,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { getWallets } from '@/http/get-wallets'
 
-import { SelectWallet } from './select-wallet'
+import { WalletSwitcher } from './wallet-switcher'
 
 export async function DashboardSidebarHeader() {
+  const walletCookie = cookies().get('wallet')?.value
+  const wallets = await getWallets()
+
+  const currentWallet = wallets.find((wallet) => wallet.slug === walletCookie)
+
   return (
     <SidebarHeader>
       <SidebarMenu>
@@ -30,14 +37,18 @@ export async function DashboardSidebarHeader() {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">Cronota</span>
-                  <span className="truncate text-xs">
-                    selecione uma carteira
+                  <span className="line-clamp-1 truncate text-xs">
+                    {currentWallet ? (
+                      <span>{currentWallet.name}</span>
+                    ) : (
+                      'Selecione uma carteira'
+                    )}
                   </span>
                 </div>
                 <ChevronsUpDown className="ml-auto" />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
-            <SelectWallet />
+            <WalletSwitcher wallets={wallets} />
           </DropdownMenu>
         </SidebarMenuItem>
       </SidebarMenu>

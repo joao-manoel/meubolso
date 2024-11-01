@@ -1,3 +1,4 @@
+import { Loader2 } from 'lucide-react'
 import * as React from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useFormState } from '@/hooks/use-form-state'
 import { SubscriptionType } from '@/http/get-profile'
 
 import {
@@ -19,7 +21,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './ui/select'
+} from '../ui/select'
+import { createWalletAction } from './actions'
 
 type CreateWalletFormProps = {
   subscription: SubscriptionType
@@ -28,6 +31,8 @@ type CreateWalletFormProps = {
 export default function CreateWalletForm({
   subscription,
 }: CreateWalletFormProps) {
+  const [, handleSubmit, isPending] = useFormState(createWalletAction)
+
   return (
     <Card className="w-[380px]">
       <CardHeader>
@@ -35,7 +40,7 @@ export default function CreateWalletForm({
         <CardDescription>Crie sua nova carteira em um clique.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="name">Nome</Label>
@@ -70,7 +75,9 @@ export default function CreateWalletForm({
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button variant="outline">Cancelar</Button>
-        <Button>Criar</Button>
+        <Button type="submit">
+          {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Criar'}
+        </Button>
       </CardFooter>
     </Card>
   )

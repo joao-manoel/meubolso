@@ -1,8 +1,9 @@
 import { api } from './api-client'
 
-interface GetWalletsResponse {
-  name: string
+export interface GetWalletsResponse {
   id: string
+  name: string
+  slug: string
   type: 'PERSONAL' | 'ORGANIZATIONAL'
 }
 
