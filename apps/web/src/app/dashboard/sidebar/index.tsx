@@ -10,6 +10,7 @@ import { DashboardNav } from './dashboard-nav'
 import { DashboardSidebarFooter } from './dashboard-sidebar-footer'
 import { DashboardSidebarHeader } from './dashboard-sidebar-header'
 import { FinancialNav } from './financial-nav'
+import { SettingsNav } from './settings-nav'
 // This is sample data.
 
 export default function Sidebar() {
@@ -19,6 +20,7 @@ export default function Sidebar() {
       <SidebarContent>
         <DashboardNav />
         <FinancialNav />
+        <SettingsNav />
       </SidebarContent>
       <DashboardSidebarFooter />
       <SidebarRail />

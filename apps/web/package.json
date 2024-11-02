@@ -12,6 +12,7 @@
   "dependencies": {
     "@cro/auth": "workspace:*",
     "@cro/env": "workspace:*",
+    "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-collapsible": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.2",

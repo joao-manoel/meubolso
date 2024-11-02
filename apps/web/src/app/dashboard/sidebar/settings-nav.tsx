@@ -18,14 +18,14 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar'
 
-import { financial } from './nav-config'
+import { settings } from './nav-config'
 
-export function FinancialNav() {
+export function SettingsNav() {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Financeiro</SidebarGroupLabel>
+      <SidebarGroupLabel>Settings</SidebarGroupLabel>
       <SidebarMenu>
-        {financial.map((item) => (
+        {settings.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip={item.title}>

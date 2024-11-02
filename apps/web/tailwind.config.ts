@@ -68,6 +68,7 @@ const config: Config = {
       },
       animation: {
         grid: 'grid 15s linear infinite',
+        pulseActive: 'pulseActive 1.5s ease-in-out infinite',
       },
       keyframes: {
         grid: {
@@ -77,6 +78,10 @@ const config: Config = {
           '100%': {
             transform: 'translateY(0)',
           },
+        },
+        pulseCustom: {
+          '0%, 100%': { transform: 'scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(1.2)', opacity: '0.7 ' },
         },
       },
     },

@@ -6,9 +6,9 @@ interface CreateWalletRequest {
 }
 
 interface CreateWalletResponse {
+  id: string
   name: string
   slug: string
-  type: string
 }
 
 export async function createWallet({ name, type }: CreateWalletRequest) {

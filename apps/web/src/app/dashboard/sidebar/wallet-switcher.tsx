@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react'
+import Link from 'next/link'
 
 import {
   DropdownMenuContent,
@@ -37,7 +38,7 @@ export async function WalletSwitcher({ wallets }: WalletSwitcherProps) {
           className="line-clamp-1 cursor-pointer gap-2 p-2"
           asChild
         >
-          <a href={`/dashboard/wallet/${wallet.slug}`}>{wallet.name}</a>
+          <a href={`/dashboard/wallets/set/${wallet.slug}`}>{wallet.name}</a>
         </DropdownMenuItem>
       ))}
       {personalWallets?.length > 0 && <DropdownMenuSeparator />}
@@ -53,16 +54,18 @@ export async function WalletSwitcher({ wallets }: WalletSwitcherProps) {
           className="line-clamp-1 cursor-pointer gap-2 p-2"
           asChild
         >
-          <a href={`/dashboard/wallet/${wallet.slug}`}>{wallet.name}</a>
+          <a href={`/dashboard/wallets/set/${wallet.slug}`}>{wallet.name}</a>
         </DropdownMenuItem>
       ))}
       {organizationWallets?.length > 0 && <DropdownMenuSeparator />}
 
-      <DropdownMenuItem className="cursor-pointer gap-2 p-2">
-        <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-          <Plus className="size-4" />
-        </div>
-        <div className="font-medium text-muted-foreground">Nova Carteira</div>
+      <DropdownMenuItem className="cursor-pointer gap-2 p-2" asChild>
+        <Link href="/dashboard/wallets/create">
+          <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+            <Plus className="size-4" />
+          </div>
+          <div className="font-medium text-muted-foreground">Nova Carteira</div>
+        </Link>
       </DropdownMenuItem>
     </DropdownMenuContent>
   )

@@ -1,12 +1,7 @@
 import { redirect } from 'next/navigation'
 
 import { isAuthenticated } from '@/auth/auth'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-} from '@/components/ui/breadcrumb'
+import Breadcrumb from '@/components/breadcrumb'
 import { Separator } from '@/components/ui/separator'
 import {
   SidebarInset,
@@ -32,18 +27,7 @@ export default function DashboardLayout({
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbPage>Dashboard</BreadcrumbPage>
-                </BreadcrumbItem>
-                {/* }
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbLink>Dashboard</BreadcrumbPage>
-                </BreadcrumbItem>{ */}
-              </BreadcrumbList>
-            </Breadcrumb>
+            <Breadcrumb homeElement={''} capitalizeLinks />
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">

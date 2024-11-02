@@ -1,4 +1,5 @@
-import { BadgeCheck, ChevronsUpDown, LogOut, Sparkles } from 'lucide-react'
+import { Bolt, ChevronsUpDown, LogOut, Sparkles } from 'lucide-react'
+import Link from 'next/link'
 
 import {
   DropdownMenu,
@@ -53,9 +54,11 @@ export async function DashboardSidebarFooter() {
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <BadgeCheck />
-                  Account
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/settings">
+                    <Bolt />
+                    Settings
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />

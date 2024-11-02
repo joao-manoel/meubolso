@@ -7,3 +7,12 @@ export function getInitials(name: string): string {
 
   return initials
 }
+
+export function transformTypeWalletText(text: string) {
+  switch (text) {
+    case 'PERSONAL':
+      return 'Pessoal'
+    case 'ORGANIZATION':
+      return 'Organização'
+  }
+}

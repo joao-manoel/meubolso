@@ -1,5 +1,6 @@
+'use server'
 import { HTTPError } from 'ky'
-import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { z } from 'zod'
 
 import { createWallet } from '@/http/create-wallets'
@@ -33,7 +34,10 @@ export async function createWalletAction(data: FormData) {
       ...(type && { type }),
     })
 
-    redirect(`/dashboard/wallet/${wallet.slug}`)
+    cookies().set('wallet', wallet.slug, {
+      path: '/',
+      maxAge: 60 * 60 * 365,
+    })
   } catch (err) {
     if (err instanceof HTTPError) {
       const { message } = await err.response.json()

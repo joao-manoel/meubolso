@@ -1,4 +1,6 @@
-import { Loader2 } from 'lucide-react'
+'use client'
+import { AlertTriangle, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import * as React from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -15,6 +17,7 @@ import { Label } from '@/components/ui/label'
 import { useFormState } from '@/hooks/use-form-state'
 import { SubscriptionType } from '@/http/get-profile'
 
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
 import {
   Select,
   SelectContent,
@@ -31,20 +34,55 @@ type CreateWalletFormProps = {
 export default function CreateWalletForm({
   subscription,
 }: CreateWalletFormProps) {
-  const [, handleSubmit, isPending] = useFormState(createWalletAction)
+  const router = useRouter()
+  const [{ errors, message, success }, handleSubmit, isPending] = useFormState(
+    createWalletAction,
+    () => {
+      router.push(`/dashboard`)
+    },
+  )
 
   return (
     <Card className="w-[380px]">
-      <CardHeader>
-        <CardTitle>Criar carteira</CardTitle>
-        <CardDescription>Crie sua nova carteira em um clique.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
+        <CardHeader>
+          <CardTitle>Criar carteira</CardTitle>
+          <CardDescription>
+            Crie sua nova carteira em um clique.
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          {success === true && message && (
+            <Alert variant="default">
+              <AlertTriangle className="size-4" />
+              <AlertTitle>Carteira criada com sucesso!</AlertTitle>
+              <AlertDescription>
+                <p>{message}</p>
+              </AlertDescription>
+            </Alert>
+          )}
+          {success === false && message && (
+            <Alert variant="destructive">
+              <AlertTriangle className="size-4" />
+              <AlertTitle>Não foi possivel criar sua carteira</AlertTitle>
+              <AlertDescription>
+                <p>{message}</p>
+              </AlertDescription>
+            </Alert>
+          )}
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="name">Nome</Label>
-              <Input id="name" placeholder="Nome da sua carteira" />
+              <Input
+                id="name"
+                name="name"
+                placeholder="Nome da sua carteira"
+                className={`${errors?.name && 'border-red-400'}`}
+              />
+              <p className="text-xs font-medium text-red-500 dark:text-red-400">
+                {errors?.name && errors.name[0]}
+              </p>
             </div>
             {subscription === 'ACTIVE' && (
               <div className="flex flex-col space-y-1.5">
@@ -54,8 +92,8 @@ export default function CreateWalletForm({
                     <SelectValue placeholder="Selecione o tipo" />
                   </SelectTrigger>
                   <SelectContent position="popper">
-                    <SelectItem value="personal">Personal</SelectItem>
-                    <SelectItem value="organizational">
+                    <SelectItem value="PERSONAL">Personal</SelectItem>
+                    <SelectItem value="ORGANIZATIONAL">
                       Organizational
                     </SelectItem>
                   </SelectContent>
@@ -71,14 +109,13 @@ export default function CreateWalletForm({
               </div>
             )}
           </div>
-        </form>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline">Cancelar</Button>
-        <Button type="submit">
-          {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Criar'}
-        </Button>
-      </CardFooter>
+        </CardContent>
+        <CardFooter className="">
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Criar'}
+          </Button>
+        </CardFooter>
+      </form>
     </Card>
   )
 }

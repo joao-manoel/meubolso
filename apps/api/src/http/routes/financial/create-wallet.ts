@@ -19,6 +19,19 @@ export async function createWallet(app: FastifyInstance) {
             name: z.string(),
             type: z.nativeEnum(WalletType).optional(),
           }),
+          security: [{ bearerAuth: [] }],
+          response: {
+            201: z.object({
+              id: z.string(),
+              name: z.string(),
+              slug: z.string(),
+            }),
+
+            500: z.object({
+              error: z.boolean(),
+              message: z.string(),
+            }),
+          },
         },
       },
       async (request, reply) => {
@@ -39,14 +52,14 @@ export async function createWallet(app: FastifyInstance) {
           })
 
           reply.status(201).send({
-            wallet: {
-              name: wallet.name,
-              slug: wallet.slug,
-            },
+            id: wallet.id,
+            name: wallet.name,
+            slug: wallet.slug,
           })
         } catch (e) {
           reply.status(500).send({
-            error:
+            error: true,
+            message:
               'Ocorreu um erro ao cria a carteira, tente novamente mais tarde!',
           })
         }
