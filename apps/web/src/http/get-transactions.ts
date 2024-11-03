@@ -20,6 +20,9 @@ type IconCardType =
   | 'MERCADOPAGO'
   | 'PAGSEGURO'
 
+type TransactionType = 'INCOME' | 'EXPENSE'
+type TransactionStatus = 'paid' | 'pending'
+
 interface CardType {
   id: string
   name: string
@@ -32,20 +35,28 @@ interface WalletType {
   slug: string
 }
 
+interface InstallmentsType {
+  id: string
+  installment: number
+  status: TransactionStatus
+  payDate?: string
+  paidAt?: string
+}
+
 export interface GetTransactionsResponse {
   id: string
   description: string
   amount: number
-  type: 'INCOME' | 'EXPENSE'
-  startDate: string
-  endDate: string
-  status: 'paid' | 'pending'
+  type: TransactionType
+  payDate: string
+  status: TransactionStatus
   card: CardType
   wallet: WalletType
+  installments: InstallmentsType[]
 }
 
 interface GetTransactionRequest {
-  type: 'INCOME' | 'EXPENSE'
+  type: TransactionType
   walletSlug: string
 }
 

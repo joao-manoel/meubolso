@@ -14,10 +14,18 @@ import {
 } from '@tanstack/react-table'
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react'
 import * as React from 'react'
+import { toast } from 'sonner'
 
 import { CardIcon } from '@/components/CardIcon'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -36,11 +44,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useFormState } from '@/hooks/use-form-state'
 import { GetTransactionsResponse } from '@/http/get-transactions'
 import { formatDate } from '@/utils/format'
-import { CalcParcelas } from '@/utils/utils'
 
 import { deleteTransactionAction } from './incomes/action'
+import CreateIncomeForm from './incomes/create-income-form'
 
 interface TransactionTableProps {
   data: GetTransactionsResponse[]
@@ -128,17 +137,20 @@ export const columns: ColumnDef<GetTransactionsResponse>[] = [
   },
 
   {
-    accessorKey: 'endDate',
+    accessorKey: 'installments',
     header: () => <div>Parcelas</div>,
     cell: ({ row }) => (
       <div className="capitalize">
-        {CalcParcelas(row.getValue('startDate'), row.getValue('endDate'))}x
+        {row.original.installments.length === 0
+          ? '1'
+          : row.original.installments.length}
+        x
       </div>
     ),
   },
 
   {
-    accessorKey: 'startDate',
+    accessorKey: 'payDate',
     header: ({ column }) => {
       return (
         <Button
@@ -151,7 +163,7 @@ export const columns: ColumnDef<GetTransactionsResponse>[] = [
       )
     },
     cell: ({ row }) => (
-      <div className="lowercase">{formatDate(row.getValue('startDate'))}</div>
+      <div className="lowercase">{formatDate(row.getValue('payDate'))}</div>
     ),
   },
 
@@ -182,6 +194,18 @@ export const columns: ColumnDef<GetTransactionsResponse>[] = [
     cell: ({ row }) => {
       const transaction = row.original
 
+      const [, handleDeleteSubmit] = useFormState(
+        deleteTransactionAction,
+        () => {
+          toast.info(`Receita ${transaction.description} foi deletada!`, {
+            action: {
+              label: 'Dispensar',
+              onClick: () => toast.dismiss(),
+            },
+          })
+        },
+      )
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -202,13 +226,9 @@ export const columns: ColumnDef<GetTransactionsResponse>[] = [
             <DropdownMenuItem>Abrir</DropdownMenuItem>
             <DropdownMenuItem>Editar</DropdownMenuItem>
             <DropdownMenuItem>
-              <form
-                action={deleteTransactionAction.bind(
-                  null,
-                  transaction.wallet.id,
-                  transaction.id,
-                )}
-              >
+              <form onSubmit={handleDeleteSubmit}>
+                <input name="transactionId" hidden value={transaction.id} />
+                <input name="walletId" hidden value={transaction.wallet.id} />
                 <button type="submit" className="p-0">
                   Deletar
                 </button>
@@ -263,7 +283,17 @@ export function TransactionsTable({ data }: TransactionTableProps) {
           }
           className="max-w-sm"
         />
-        <Button variant="secondary">Nova Receita</Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="secondary">Nova Receita</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Nova Receita</DialogTitle>
+              <CreateIncomeForm />
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

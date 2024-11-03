@@ -204,8 +204,7 @@ model Transaction {
   description String
   amount      Int
   type        TransactionType
-  startDate   DateTime              @map("start_date")
-  endDate     DateTime?             @map("end_date")
+  payDate     DateTime              @map("pay_date")
   status      TransactionStatusType @default(pending)
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -214,19 +213,19 @@ model Transaction {
   wallet   Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
   walletId String @map("wallet_id")
 
-  card        Card          @relation(fields: [cardId], references: [id])
-  cardId      String        @map("card_id")
-  installment Installment[]
+  card         Card           @relation(fields: [cardId], references: [id])
+  cardId       String         @map("card_id")
+  installments Installments[]
 
   @@map("transactions")
 }
 
-model Installment {
-  id      String                @id @default(uuid())
-  value   Int
-  status  TransactionStatusType
-  payDate DateTime?             @map("pay_date")
-  paidAt  DateTime?             @map("paid_at")
+model Installments {
+  id          String                @id @default(uuid())
+  installment Int
+  status      TransactionStatusType
+  payDate     DateTime?             @map("pay_date")
+  paidAt      DateTime?             @map("paid_at")
 
   transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   transactionId String

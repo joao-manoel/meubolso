@@ -14,6 +14,7 @@ export async function deleteTransaction(app: FastifyInstance) {
       '/wallet/:walletId/transaction/:transactionId',
       {
         schema: {
+          tags: ['Transactions'],
           summary: 'Delete transactions',
           security: [{ bearerAuth: [] }],
           params: z.object({

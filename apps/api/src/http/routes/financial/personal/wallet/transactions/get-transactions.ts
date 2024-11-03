@@ -19,7 +19,7 @@ export async function getTransactions(app: FastifyInstance) {
       '/wallet/:walletSlug/transactions/:type',
       {
         schema: {
-          tags: ['Auth'],
+          tags: ['Transactions'],
           summary: 'Get personal wallet transactions',
           security: [{ bearerAuth: [] }],
           params: z.object({
@@ -29,24 +29,33 @@ export async function getTransactions(app: FastifyInstance) {
           response: {
             200: z.array(
               z.object({
-                id: z.string(),
+                id: z.string().uuid(),
                 description: z.string(),
                 amount: z.number(),
                 type: z.nativeEnum(TransactionType),
-
-                startDate: z.date(),
-                endDate: z.date().nullable(),
+                payDate: z.date(),
                 status: z.nativeEnum(TransactionStatusType),
                 card: z.object({
-                  id: z.string(),
+                  id: z.string().uuid(),
                   name: z.string(),
                   icon: z.nativeEnum(IconCardType),
                 }),
                 wallet: z.object({
-                  id: z.string(),
+                  id: z.string().uuid(),
                   name: z.string(),
                   slug: z.string(),
                 }),
+                installments: z
+                  .array(
+                    z.object({
+                      id: z.string().uuid(),
+                      installment: z.number(),
+                      status: z.nativeEnum(TransactionStatusType),
+                      payDate: z.date().nullish(),
+                      paidAt: z.date().nullish(),
+                    }),
+                  )
+                  .optional(),
               }),
             ),
           },
@@ -74,8 +83,7 @@ export async function getTransactions(app: FastifyInstance) {
             status: true,
             amount: true,
             type: true,
-            startDate: true,
-            endDate: true,
+            payDate: true,
             card: {
               select: {
                 id: true,
@@ -90,13 +98,22 @@ export async function getTransactions(app: FastifyInstance) {
                 slug: true,
               },
             },
+            installments: {
+              select: {
+                id: true,
+                installment: true,
+                payDate: true,
+                paidAt: true,
+                status: true,
+              },
+            },
           },
           where: {
             walletId: wallet.id,
             type,
           },
           orderBy: {
-            endDate: 'desc',
+            payDate: 'desc',
           },
         })
 

@@ -11,6 +11,7 @@ export async function deletePersonalWalletAction(walletId: string) {
   await deleteWallet({
     walletId,
   })
+
   revalidateTag('wallets')
 }
 

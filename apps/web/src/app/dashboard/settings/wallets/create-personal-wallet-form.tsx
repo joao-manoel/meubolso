@@ -2,6 +2,7 @@
 import { AlertTriangle, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
+import { toast } from 'sonner'
 
 import Input from '@/components/Input'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -16,6 +17,13 @@ export default function CreatePersonalWalletForm() {
     createWalletAction,
     () => {
       router.push(`/dashboard`)
+      toast.success('Carteira criada com sucesso!', {
+        description: 'Você foi direcionado para a dashboard.',
+        action: {
+          label: 'Dispensar',
+          onClick: () => toast.dismiss(),
+        },
+      })
     },
   )
 

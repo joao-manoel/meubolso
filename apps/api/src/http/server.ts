@@ -14,6 +14,7 @@ import { getProfile } from './routes/auth/get-profile'
 import { createWallet } from './routes/financial/personal/wallet/create-wallet'
 import { deleteWallet } from './routes/financial/personal/wallet/delete-wallet'
 import { getWallets } from './routes/financial/personal/wallet/get-wallets'
+import { createTransaction } from './routes/financial/personal/wallet/transactions/create-transaction'
 import { deleteTransaction } from './routes/financial/personal/wallet/transactions/delete-transactions'
 import { getTransactions } from './routes/financial/personal/wallet/transactions/get-transactions'
 
@@ -38,6 +39,7 @@ app.register(deleteWallet)
 
 app.register(getTransactions)
 app.register(deleteTransaction)
+app.register(createTransaction)
 
 app.listen({ port: env.SERVER_PORT }).then(() => {
   console.log(`🔥 Server listening on ${env.SERVER_PORT}`)

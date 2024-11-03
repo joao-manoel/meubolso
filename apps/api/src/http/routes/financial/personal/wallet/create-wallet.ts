@@ -4,6 +4,7 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 
 import { auth } from '@/http/middlewares/auth'
+import { BadRequestError } from '@/http/routes/_errors/bad-request-error'
 import { prisma } from '@/lib/prisma'
 import { createSlug } from '@/utils/format'
 
@@ -42,6 +43,17 @@ export async function createWallet(app: FastifyInstance) {
         const slug = createSlug(name)
 
         try {
+          const walletExist = await prisma.wallet.findFirst({
+            where: {
+              slug,
+              ownerId: userId,
+            },
+          })
+
+          if (walletExist) {
+            throw new BadRequestError('Você ja tem uma carteira com esse nome!')
+          }
+
           const wallet = await prisma.wallet.create({
             data: {
               ownerId: userId,
