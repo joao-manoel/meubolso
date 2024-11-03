@@ -5,8 +5,8 @@ export function middleware(request: NextRequest) {
 
   const response = NextResponse.next()
 
-  if (pathname.startsWith('/dashboard/wallets/set')) {
-    const [, , , , slug] = pathname.split('/')
+  if (pathname.startsWith('/dashboard/settings/wallets/select')) {
+    const [, , , , , slug] = pathname.split('/')
 
     response.cookies.set('wallet', slug)
   }

@@ -41,6 +41,7 @@ export async function getWallets(app: FastifyInstance) {
           },
           where: {
             ownerId: userId,
+            type: 'PERSONAL',
           },
         })
 

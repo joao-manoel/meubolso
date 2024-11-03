@@ -16,10 +16,6 @@ interface WalletSwitcherProps {
 export async function WalletSwitcher({ wallets }: WalletSwitcherProps) {
   const personalWallets = wallets.filter((wallet) => wallet.type === 'PERSONAL')
 
-  const organizationWallets = wallets.filter(
-    (wallet) => wallet.type === 'ORGANIZATIONAL',
-  )
-
   return (
     <DropdownMenuContent
       className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
@@ -38,29 +34,15 @@ export async function WalletSwitcher({ wallets }: WalletSwitcherProps) {
           className="line-clamp-1 cursor-pointer gap-2 p-2"
           asChild
         >
-          <a href={`/dashboard/wallets/set/${wallet.slug}`}>{wallet.name}</a>
+          <a href={`/dashboard/settings/wallets/select/${wallet.slug}`}>
+            {wallet.name}
+          </a>
         </DropdownMenuItem>
       ))}
       {personalWallets?.length > 0 && <DropdownMenuSeparator />}
 
-      {organizationWallets?.length > 0 && (
-        <DropdownMenuLabel className="text-xs text-muted-foreground">
-          Organização
-        </DropdownMenuLabel>
-      )}
-      {organizationWallets.map((wallet) => (
-        <DropdownMenuItem
-          key={wallet.name}
-          className="line-clamp-1 cursor-pointer gap-2 p-2"
-          asChild
-        >
-          <a href={`/dashboard/wallets/set/${wallet.slug}`}>{wallet.name}</a>
-        </DropdownMenuItem>
-      ))}
-      {organizationWallets?.length > 0 && <DropdownMenuSeparator />}
-
       <DropdownMenuItem className="cursor-pointer gap-2 p-2" asChild>
-        <Link href="/dashboard/wallets/create">
+        <Link href="/dashboard/settings/wallets/create">
           <div className="flex size-6 items-center justify-center rounded-md border bg-background">
             <Plus className="size-4" />
           </div>

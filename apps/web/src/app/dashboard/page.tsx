@@ -1,6 +1,14 @@
 import { auth } from '@/auth/auth'
-import CreateWalletForm from '@/components/create-wallet/create-wallet-form'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { getWallets } from '@/http/get-wallets'
+
+import CreatePersonalWalletForm from './settings/wallets/create-personal-wallet-form'
 
 export default async function DashboardPage() {
   const { user } = await auth()
@@ -9,16 +17,21 @@ export default async function DashboardPage() {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-2">
       <h1 className="text-3xl font-bold">👋 Bem-vindo, {user?.name}!</h1>
-      {wallets.length <= 0 && (
-        <p className="text-center text-sm font-light">
-          Você ainda não tem uma carteira, vamos criar uma!
-        </p>
-      )}
 
       <div className="pt-3">
         {wallets.length <= 0 && (
           <>
-            <CreateWalletForm subscription={user?.subscription || 'NONE'} />
+            <Card className="w-[380px]">
+              <CardHeader className="item flex flex-col items-center justify-center">
+                <CardTitle>Cria Carteira</CardTitle>
+                <CardDescription>
+                  Você ainda não tem uma carteira, vamos criar uma!
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CreatePersonalWalletForm />
+              </CardContent>
+            </Card>
           </>
         )}
       </div>

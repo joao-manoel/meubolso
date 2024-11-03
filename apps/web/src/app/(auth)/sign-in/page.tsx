@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import googleIcon from '@/assets/google-icon.svg'
-import FloatingLabelInput from '@/components/FloatingLabelInput'
+import Input from '@/components/Input'
 import GridPattern from '@/components/ui/animated-grid-pattern'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
@@ -35,15 +35,11 @@ export default function SignUpPage() {
           </h1>
           <form action="" className="w-full space-y-8">
             <div className="w-full space-y-1">
-              <FloatingLabelInput label="Seu email" name="email" type="email" />
+              <Input label="Seu email" name="email" type="email" />
             </div>
 
             <div className="space-y-1">
-              <FloatingLabelInput
-                label="Sua senha"
-                name="password"
-                type="password"
-              />
+              <Input label="Sua senha" name="password" type="password" />
 
               <Link
                 href="/auth/forgot-password"

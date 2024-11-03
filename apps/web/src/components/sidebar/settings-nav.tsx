@@ -23,7 +23,7 @@ import { settings } from './nav-config'
 export function SettingsNav() {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Settings</SidebarGroupLabel>
+      <SidebarGroupLabel>Configurações</SidebarGroupLabel>
       <SidebarMenu>
         {settings.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>

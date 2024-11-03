@@ -21,6 +21,11 @@ enum TransactionType {
   EXPENSE
 }
 
+enum TransactionStatusType {
+  paid
+  pending
+}
+
 enum InviteStatus {
   PENDING
   ACCEPTED
@@ -42,6 +47,27 @@ enum SubscriptionType {
   CANCELLED
 }
 
+enum IconCardType {
+  CARTEIRA
+  NUBANK
+  BB
+  ITAU
+  SICREDI
+  BRADESCO
+  SANTANDER
+  CAIXA
+  INTER
+  C6BANK
+  NEXT
+  NEON
+  PAN
+  PICPAY
+  INFINITYPAY
+  ITI
+  MERCADOPAGO
+  PAGSEGURO
+}
+
 model User {
   id           String           @id @default(uuid())
   name         String?
@@ -59,6 +85,7 @@ model User {
   Member       Member[]
   Invite       Invite[]
   Token        Token[]
+  Card         Card[]
 
   @@map("users")
 }
@@ -151,20 +178,58 @@ model Wallet {
   organizationId String?       @map("organization_id")
 
   Transaction Transaction[]
+  Card        Card[]
 
   @@map("wallets")
 }
 
-model Transaction {
-  id          String          @id @default(uuid())
-  description String
-  amount      Int
-  type        TransactionType
-  startDate   DateTime        @map("start_date")
-  endDate     DateTime        @map("end_date")
+model Card {
+  id        String       @id @default(uuid())
+  name      String
+  icon      IconCardType @default(CARTEIRA)
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
 
   wallet   Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
   walletId String @map("wallet_id")
 
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String @map("owner_id")
+
+  Transaction Transaction[]
+}
+
+model Transaction {
+  id          String                @id @default(uuid())
+  description String
+  amount      Int
+  type        TransactionType
+  startDate   DateTime              @map("start_date")
+  endDate     DateTime?             @map("end_date")
+  status      TransactionStatusType @default(pending)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  wallet   Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  walletId String @map("wallet_id")
+
+  card        Card          @relation(fields: [cardId], references: [id])
+  cardId      String        @map("card_id")
+  installment Installment[]
+
   @@map("transactions")
+}
+
+model Installment {
+  id      String                @id @default(uuid())
+  value   Int
+  status  TransactionStatusType
+  payDate DateTime?             @map("pay_date")
+  paidAt  DateTime?             @map("paid_at")
+
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  transactionId String
+
+  @@map("installment")
 }

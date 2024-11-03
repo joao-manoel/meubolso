@@ -2,14 +2,13 @@ import { redirect } from 'next/navigation'
 
 import { isAuthenticated } from '@/auth/auth'
 import Breadcrumb from '@/components/breadcrumb'
+import Sidebar from '@/components/sidebar'
 import { Separator } from '@/components/ui/separator'
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
-
-import Sidebar from './sidebar'
 
 export default function DashboardLayout({
   children,

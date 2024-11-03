@@ -1,10 +1,4 @@
-import {
-  ArrowLeftRight,
-  CirclePlus,
-  CreditCard,
-  Home,
-  Wallet,
-} from 'lucide-react'
+import { ArrowLeftRight, CirclePlus, Home, Wallet } from 'lucide-react'
 import { ComponentType } from 'react'
 
 type ListType = {
@@ -41,42 +35,37 @@ export const Dashboard: ListType[] = [
 export const financial: ListType[] = [
   {
     title: 'Transações',
-    url: '/transactions',
+    url: '/dashboard/transactions',
     icon: ArrowLeftRight,
     subMenu: [
       {
         title: 'Receitas',
-        url: '/transactions/income',
+        url: '/dashboard/transactions/incomes',
         icon: CirclePlus,
       },
       {
         title: 'Despesas',
-        url: '/transactions/expense',
+        url: '/dashboard/transactions/expenses',
         icon: CirclePlus,
       },
     ],
-  },
-  {
-    title: 'Cartões',
-    url: '#',
-    icon: CreditCard,
   },
 ]
 
 export const settings: ListType[] = [
   {
-    title: 'Wallets',
-    url: '/dashboard/wallets',
+    title: 'Carteiras',
+    url: '/dashboard/settings/wallets',
     icon: Wallet,
     subMenu: [
       {
         title: 'Gerenciar',
-        url: '/dashboard/wallets',
+        url: '/dashboard/settings/wallets',
         icon: CirclePlus,
       },
       {
-        title: 'Criar Carteira',
-        url: '/dashboard/wallets/create',
+        title: 'Cartões',
+        url: '/dashboard/settings/wallets/cards',
         icon: CirclePlus,
       },
     ],

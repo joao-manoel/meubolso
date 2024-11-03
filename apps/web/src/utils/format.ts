@@ -16,3 +16,13 @@ export function transformTypeWalletText(text: string) {
       return 'Organização'
   }
 }
+
+export function formatDate(value: string) {
+  const date = new Date(value)
+
+  return date.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  })
+}

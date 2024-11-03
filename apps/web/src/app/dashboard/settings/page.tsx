@@ -1,3 +1,3 @@
 export default function SettingsPage() {
-  return <div>page</div>
+  return <div>Settings</div>
 }

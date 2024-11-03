@@ -2,20 +2,14 @@ import React, { InputHTMLAttributes, useEffect, useState } from 'react'
 
 import { cn } from '@/lib/utils'
 
-import { Input } from './ui/input'
+import { Input as I } from './ui/input'
 
-interface FloatingLabelInputProps
-  extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string
   id?: string // Opcional para permitir passagem do id manualmente
 }
 
-const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
-  label,
-  id,
-  className,
-  ...props
-}) => {
+const Input: React.FC<InputProps> = ({ label, id, className, ...props }) => {
   const [value, setValue] = useState<string>(props.value?.toString() || '')
   const [isFocused, setIsFocused] = useState(false)
 
@@ -43,7 +37,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
 
   return (
     <div className="relative">
-      <Input
+      <I
         id={inputId}
         className={cn(
           'block w-full rounded-md px-4 py-2 pb-2 pt-2 placeholder-transparent shadow-sm focus:outline-none',
@@ -70,4 +64,4 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   )
 }
 
-export default FloatingLabelInput
+export default Input

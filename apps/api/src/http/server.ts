@@ -11,8 +11,11 @@ import {
 import { authenticateWithGoogle } from './routes/auth/authenticate-with-google'
 import { createAccount } from './routes/auth/create-account'
 import { getProfile } from './routes/auth/get-profile'
-import { createWallet } from './routes/financial/create-wallet'
-import { getWallets } from './routes/financial/get-wallets'
+import { createWallet } from './routes/financial/personal/wallet/create-wallet'
+import { deleteWallet } from './routes/financial/personal/wallet/delete-wallet'
+import { getWallets } from './routes/financial/personal/wallet/get-wallets'
+import { deleteTransaction } from './routes/financial/personal/wallet/transactions/delete-transactions'
+import { getTransactions } from './routes/financial/personal/wallet/transactions/get-transactions'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -31,6 +34,10 @@ app.register(getProfile)
 
 app.register(getWallets)
 app.register(createWallet)
+app.register(deleteWallet)
+
+app.register(getTransactions)
+app.register(deleteTransaction)
 
 app.listen({ port: env.SERVER_PORT }).then(() => {
   console.log(`🔥 Server listening on ${env.SERVER_PORT}`)

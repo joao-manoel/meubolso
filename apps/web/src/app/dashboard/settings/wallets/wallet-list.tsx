@@ -1,7 +1,6 @@
-'use server'
-
 import { ExternalLink, Trash2, Wallet } from 'lucide-react'
 import { cookies } from 'next/headers'
+import Link from 'next/link'
 
 import {
   AlertDialog,
@@ -19,20 +18,25 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { getWallets } from '@/http/get-wallets'
 import { transformTypeWalletText } from '@/utils/format'
 
+import { deletePersonalWalletAction } from './action'
+
 export default async function WalletList() {
   const walletSlugCookie = cookies().get('wallet')?.value
   const wallets = await getWallets()
 
-  const personalWallets = wallets.filter((wallet) => wallet.type === 'PERSONAL')
-
   return (
     <div className="space-y-2">
-      <h2 className="text-lg font-semibold">Carteiras</h2>
+      <header className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Carteiras</h2>
+        <Button size="sm" variant="secondary" asChild>
+          <Link href="/dashboard/settings/wallets/create">Nova carteira</Link>
+        </Button>
+      </header>
 
       <div className="rounded border">
         <Table>
           <TableBody>
-            {personalWallets.map((wallet) => {
+            {wallets.map((wallet) => {
               return (
                 <TableRow key={wallet.id}>
                   <TableCell className="py-2.5" style={{ width: 48 }}>
@@ -59,7 +63,9 @@ export default async function WalletList() {
 
                       {walletSlugCookie !== wallet.slug && (
                         <Button size="sm" variant="ghost" asChild>
-                          <a href={`/dashboard/wallets/set/${wallet.slug}`}>
+                          <a
+                            href={`/dashboard/settings/wallets/select/${wallet.slug}`}
+                          >
                             <ExternalLink />
                             Visualizar
                           </a>
@@ -77,7 +83,7 @@ export default async function WalletList() {
                           <AlertDialogContent>
                             <AlertDialogHeader>
                               <AlertDialogTitle>
-                                você tem certeza em deletar carteira{' '}
+                                Tem certeza em deletar carteira{' '}
                                 <span className="text-red-500 underline">
                                   {wallet.name}
                                 </span>
@@ -91,8 +97,24 @@ export default async function WalletList() {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction asChild>
-                                <Button variant="destructive">Continue</Button>
+                              <AlertDialogAction
+                                asChild
+                                className="bg-transparent p-0 hover:bg-transparent"
+                              >
+                                <form
+                                  action={deletePersonalWalletAction.bind(
+                                    null,
+                                    wallet.id,
+                                  )}
+                                >
+                                  <Button
+                                    variant="destructive"
+                                    type="submit"
+                                    className="w-full"
+                                  >
+                                    Deletar
+                                  </Button>
+                                </form>
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>

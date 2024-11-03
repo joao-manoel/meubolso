@@ -17,6 +17,27 @@ type TBreadcrumbProps = {
   capitalizeLinks?: boolean
 }
 
+const translate = (text: string) => {
+  switch (text) {
+    case 'Dashboard':
+      return 'Inicio'
+    case 'Settings':
+      return 'Configurações'
+    case 'Incomes':
+      return 'Receitas'
+    case 'Expenses':
+      return 'Despesas'
+    case 'Wallets':
+      return 'Carteiras'
+    case 'Cards':
+      return 'Cartões'
+    case 'Transactions':
+      return 'Transações'
+    default:
+      return text
+  }
+}
+
 const Breadcrumb = ({
   homeElement,
   capitalizeLinks = false,
@@ -46,7 +67,7 @@ const Breadcrumb = ({
 
               <BreadcrumbItem>
                 <BreadcrumbPage className={isActive ? 'active-class' : ''}>
-                  <Link href={href}>{itemLink}</Link>
+                  <Link href={href}>{translate(itemLink)}</Link>
                 </BreadcrumbPage>
               </BreadcrumbItem>
             </React.Fragment>

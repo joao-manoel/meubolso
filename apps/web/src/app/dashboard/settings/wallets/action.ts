@@ -1,9 +1,18 @@
 'use server'
 import { HTTPError } from 'ky'
+import { revalidateTag } from 'next/cache'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
 
 import { createWallet } from '@/http/create-wallets'
+import { deleteWallet } from '@/http/delete-wallet'
+
+export async function deletePersonalWalletAction(walletId: string) {
+  await deleteWallet({
+    walletId,
+  })
+  revalidateTag('wallets')
+}
 
 const createWalletSchema = z.object({
   name: z
@@ -38,6 +47,7 @@ export async function createWalletAction(data: FormData) {
       path: '/',
       maxAge: 60 * 60 * 365,
     })
+    revalidateTag('wallets')
   } catch (err) {
     if (err instanceof HTTPError) {
       const { message } = await err.response.json()
