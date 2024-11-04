@@ -26,8 +26,8 @@ export default function CreateIncomeForm() {
   const [category, setCategory] = useState('')
   const [card, setCard] = useState('')
   const [entryType, setEntryType] = useState<
-    'unico' | 'recorrente' | 'parcelado'
-  >('unico')
+    'variable' | 'recorrente' | 'parcelado'
+  >('variable')
   const [recurrenceType, setRecurrenceType] = useState<'mensal' | 'anual'>(
     'mensal',
   )
@@ -164,8 +164,8 @@ export default function CreateIncomeForm() {
             <div className="flex space-x-2">
               <Button
                 type="button"
-                variant={entryType === 'unico' ? 'default' : 'outline'}
-                onClick={() => setEntryType('unico')}
+                variant={entryType === 'variable' ? 'default' : 'outline'}
+                onClick={() => setEntryType('variable')}
               >
                 Único
               </Button>

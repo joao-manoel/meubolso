@@ -269,11 +269,9 @@ export function TransactionsTable({ data }: TransactionTableProps) {
       <div className="flex items-center gap-2 py-4">
         <Input
           placeholder="Encontrar receita..."
-          value={
-            (table.getColumn('description')?.getFilterValue() as string) ?? ''
-          }
+          value={(table.getColumn('Titulo')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
-            table.getColumn('description')?.setFilterValue(event.target.value)
+            table.getColumn('Titulo')?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
