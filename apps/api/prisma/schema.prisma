@@ -68,6 +68,12 @@ enum IconCardType {
   PAGSEGURO
 }
 
+enum RecurrenceType {
+  VARIABLE
+  MONTH
+  YEAR
+}
+
 model User {
   id           String           @id @default(uuid())
   name         String?
@@ -204,8 +210,12 @@ model Transaction {
   description String
   amount      Int
   type        TransactionType
+  recurrence  RecurrenceType        @default(VARIABLE)
   payDate     DateTime              @map("pay_date")
   status      TransactionStatusType @default(pending)
+
+  category   Categorys @relation(fields: [categoryId], references: [id])
+  categoryId String
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -213,8 +223,9 @@ model Transaction {
   wallet   Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
   walletId String @map("wallet_id")
 
-  card         Card           @relation(fields: [cardId], references: [id])
-  cardId       String         @map("card_id")
+  card   Card   @relation(fields: [cardId], references: [id])
+  cardId String @map("card_id")
+
   installments Installments[]
 
   @@map("transactions")
@@ -231,4 +242,15 @@ model Installments {
   transactionId String
 
   @@map("installment")
+}
+
+model Categorys {
+  id    String @id @default(uuid())
+  title String
+  icon  String
+  slug  String
+
+  Transaction Transaction[]
+
+  @@map("category")
 }

@@ -1,4 +1,8 @@
-import { TransactionStatusType, TransactionType } from '@prisma/client'
+import {
+  RecurrenceType,
+  TransactionStatusType,
+  TransactionType,
+} from '@prisma/client'
 import { FastifyInstance } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -26,6 +30,8 @@ export async function createTransaction(app: FastifyInstance) {
             amount: z.number(),
             type: z.nativeEnum(TransactionType),
             payDate: z.string(),
+            recurrence: z.nativeEnum(RecurrenceType),
+            categoryId: z.string().uuid(),
             cardId: z.string(),
             status: z.nativeEnum(TransactionStatusType),
             installments: z
@@ -59,6 +65,8 @@ export async function createTransaction(app: FastifyInstance) {
           type,
           status,
           installments,
+          categoryId,
+          recurrence,
         } = request.body
 
         try {
@@ -95,6 +103,8 @@ export async function createTransaction(app: FastifyInstance) {
               amount,
               status,
               payDate: payDateObj,
+              categoryId,
+              recurrence,
               type,
               cardId,
               walletId: wallet.id,

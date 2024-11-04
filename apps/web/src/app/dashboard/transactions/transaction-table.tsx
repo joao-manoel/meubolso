@@ -19,13 +19,7 @@ import { toast } from 'sonner'
 import { CardIcon } from '@/components/CardIcon'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -79,15 +73,15 @@ export const columns: ColumnDef<GetTransactionsResponse>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'description',
-    header: () => <div>Descrição</div>,
+    accessorKey: 'Titulo',
+    header: () => <div>Titulo</div>,
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue('description')}</div>
     ),
   },
 
   {
-    accessorKey: 'amount',
+    accessorKey: 'Valor',
     header: ({ column }) => {
       return (
         <Button
@@ -137,7 +131,7 @@ export const columns: ColumnDef<GetTransactionsResponse>[] = [
   },
 
   {
-    accessorKey: 'installments',
+    accessorKey: 'Parcelas',
     header: () => <div>Parcelas</div>,
     cell: ({ row }) => (
       <div className="capitalize">
@@ -150,7 +144,7 @@ export const columns: ColumnDef<GetTransactionsResponse>[] = [
   },
 
   {
-    accessorKey: 'payDate',
+    accessorKey: 'Vencimento',
     header: ({ column }) => {
       return (
         <Button
@@ -168,7 +162,7 @@ export const columns: ColumnDef<GetTransactionsResponse>[] = [
   },
 
   {
-    accessorKey: 'card',
+    accessorKey: 'cartão',
     header: ({ column }) => {
       return (
         <Button
@@ -287,11 +281,9 @@ export function TransactionsTable({ data }: TransactionTableProps) {
           <DialogTrigger asChild>
             <Button variant="secondary">Nova Receita</Button>
           </DialogTrigger>
+
           <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Nova Receita</DialogTitle>
-              <CreateIncomeForm />
-            </DialogHeader>
+            <CreateIncomeForm />
           </DialogContent>
         </Dialog>
         <DropdownMenu>
