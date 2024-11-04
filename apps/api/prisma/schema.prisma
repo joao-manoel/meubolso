@@ -192,6 +192,7 @@ model Wallet {
 model Card {
   id        String       @id @default(uuid())
   name      String
+  limit     Int          @default(0)
   icon      IconCardType @default(CARTEIRA)
   createdAt DateTime     @default(now()) @map("created_at")
   updatedAt DateTime     @updatedAt @map("updated_at")
