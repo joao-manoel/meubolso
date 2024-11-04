@@ -12,7 +12,13 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react'
+import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpDown,
+  ChevronDown,
+  MoreHorizontal,
+} from 'lucide-react'
 import * as React from 'react'
 import { toast } from 'sonner'
 
@@ -267,23 +273,41 @@ export function TransactionsTable({ data }: TransactionTableProps) {
     <div className="w-full p-2">
       <h1 className="text-2xl font-bold">Receitas</h1>
       <div className="flex items-center gap-2 py-4">
-        <Input
-          placeholder="Encontrar receita..."
-          value={(table.getColumn('Titulo')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
-            table.getColumn('Titulo')?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="secondary">Nova Receita</Button>
-          </DialogTrigger>
+        <div className="flex w-full gap-2">
+          <Input
+            placeholder="Encontrar receita..."
+            value={
+              (table.getColumn('Titulo')?.getFilterValue() as string) ?? ''
+            }
+            onChange={(event) =>
+              table.getColumn('Titulo')?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Nova Receita</Button>
+            </DialogTrigger>
 
-          <DialogContent>
-            <CreateIncomeForm />
-          </DialogContent>
-        </Dialog>
+            <DialogContent>
+              <CreateIncomeForm />
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        <div className="flex items-center gap-2 rounded-md border border-input bg-background">
+          <Button variant="ghost" size="sm" className="rounded-none">
+            <ArrowLeft />
+          </Button>
+          <div className="flex flex-col items-center justify-center">
+            <span className="text-[10px] text-muted-foreground">2024</span>
+            <span className="text-[14px]">Novembro</span>
+          </div>
+          <Button variant="ghost" size="sm" className="rounded-none">
+            <ArrowRight />
+          </Button>
+        </div>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
