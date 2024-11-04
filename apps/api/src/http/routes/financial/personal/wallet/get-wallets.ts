@@ -32,20 +32,24 @@ export async function getWallets(app: FastifyInstance) {
       async (request, reply) => {
         const userId = await request.getCurrentUserId()
 
-        const wallets = await prisma.wallet.findMany({
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            type: true,
-          },
-          where: {
-            ownerId: userId,
-            type: 'PERSONAL',
-          },
-        })
+        try {
+          const wallets = await prisma.wallet.findMany({
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              type: true,
+            },
+            where: {
+              ownerId: userId,
+              type: 'PERSONAL',
+            },
+          })
 
-        return reply.send(wallets)
+          return reply.send(wallets)
+        } catch (error) {
+          throw new Error('Database error.')
+        }
       },
     )
 }
