@@ -1,4 +1,5 @@
 import { format, startOfToday } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { CalendarIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
@@ -132,7 +133,13 @@ export default function CreateIncomeForm() {
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, 'PPP') : <span>Selecione uma data</span>}
+                  {date ? (
+                    format(date, 'PPP', {
+                      locale: ptBR,
+                    })
+                  ) : (
+                    <span>Selecione uma data</span>
+                  )}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -140,6 +147,7 @@ export default function CreateIncomeForm() {
                   mode="single"
                   selected={date}
                   onSelect={handleDateSelect}
+                  locale={ptBR}
                   initialFocus
                 />
               </PopoverContent>

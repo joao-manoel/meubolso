@@ -1,5 +1,4 @@
 'use client'
-
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,6 +11,8 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table'
+import { addMonths, format, subMonths } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import {
   ArrowLeft,
   ArrowRight,
@@ -19,8 +20,7 @@ import {
   ChevronDown,
   MoreHorizontal,
 } from 'lucide-react'
-import * as React from 'react'
-import { toast } from 'sonner'
+import { useMemo, useState } from 'react'
 
 import { CardIcon } from '@/components/CardIcon'
 import { Button } from '@/components/ui/button'
@@ -44,18 +44,68 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useFormState } from '@/hooks/use-form-state'
 import { GetTransactionsResponse } from '@/http/get-transactions'
-import { formatDate } from '@/utils/format'
 
-import { deleteTransactionAction } from './incomes/action'
 import CreateIncomeForm from './incomes/create-income-form'
 
 interface TransactionTableProps {
   data: GetTransactionsResponse[]
 }
 
-export const columns: ColumnDef<GetTransactionsResponse>[] = [
+type TransactionWithInstallmentInfo = GetTransactionsResponse & {
+  installmentInfo?: {
+    id: string
+    installment: number
+    status: 'paid' | 'pending'
+    payDate: string
+    paidAt?: string
+  }
+}
+
+const filterTransactions = (
+  transactions: GetTransactionsResponse[],
+  currentDate: Date,
+): TransactionWithInstallmentInfo[] => {
+  return transactions.flatMap((transaction) => {
+    const transactionDate = new Date(transaction.payDate)
+    const isSameMonth = transactionDate.getMonth() === currentDate.getMonth()
+    const isSameYear =
+      transactionDate.getFullYear() === currentDate.getFullYear()
+
+    // Handle installments
+    if (transaction.installments.length > 0) {
+      return transaction.installments
+        .filter((installment) => {
+          const installmentDate = new Date(installment.payDate)
+          return (
+            installmentDate.getMonth() === currentDate.getMonth() &&
+            installmentDate.getFullYear() === currentDate.getFullYear()
+          )
+        })
+        .map((installment) => ({
+          ...transaction,
+          amount: transaction.amount / transaction.installments.length,
+          installmentInfo: installment,
+        }))
+    }
+
+    // Handle non-installment transactions
+    switch (transaction.recurrence) {
+      case 'VARIABLE':
+        return isSameMonth && isSameYear ? [transaction] : []
+      case 'MONTH':
+        return isSameMonth ? [transaction] : []
+      case 'YEAR':
+        return transactionDate.getMonth() === currentDate.getMonth()
+          ? [transaction]
+          : []
+      default:
+        return []
+    }
+  }) as TransactionWithInstallmentInfo[]
+}
+
+const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -79,15 +129,18 @@ export const columns: ColumnDef<GetTransactionsResponse>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'Titulo',
-    header: () => <div>Titulo</div>,
+    accessorKey: 'description',
+    header: 'Título',
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('description')}</div>
+      <div className="capitalize">
+        {row.original.installmentInfo
+          ? `${row.getValue('description')} (Parcela ${row.original.installmentInfo.installment})`
+          : row.getValue('description')}
+      </div>
     ),
   },
-
   {
-    accessorKey: 'Valor',
+    accessorKey: 'amount',
     header: ({ column }) => {
       return (
         <Button
@@ -101,111 +154,67 @@ export const columns: ColumnDef<GetTransactionsResponse>[] = [
     },
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('amount')) / 10
-
-      const formatted = new Intl.NumberFormat('pt-Br', {
+      const formatted = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL',
       }).format(amount)
-
       return <div className="font-medium">{formatted}</div>
     },
   },
-
   {
     accessorKey: 'status',
-    header: ({ column }) => {
+    header: 'Status',
+    cell: ({ row }) => {
+      const status =
+        row.original.installmentInfo?.status || row.getValue('status')
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <span
+            className={`h-2 w-2 rounded-full ${status === 'pending' ? 'bg-orange-400' : 'bg-green-400'}`}
+          />
+          <span className="capitalize">
+            {status === 'pending' ? 'Aguardando' : 'Pago'}
+          </span>
+        </div>
       )
     },
+  },
+  {
+    accessorKey: 'installments',
+    header: 'Parcelas',
+    cell: ({ row }) => {
+      const installmentInfo = row.original.installmentInfo
+      if (installmentInfo) {
+        return `${installmentInfo.installment}/${row.original.installments.length}`
+      }
+      return '1x'
+    },
+  },
+  {
+    accessorKey: 'payDate',
+    header: 'Vencimento',
+    cell: ({ row }) => {
+      const date =
+        row.original.installmentInfo?.payDate || row.getValue('payDate')
+      return format(new Date(date || ''), 'dd/MM/yyyy')
+    },
+  },
+  {
+    accessorKey: 'card',
+    header: 'Cartão',
     cell: ({ row }) => (
-      <div className="flex items-center gap-2 rounded-full capitalize">
-        {row.getValue('status') === 'pending' ? (
-          <span className="h-2 w-2 rounded-full bg-orange-400" />
-        ) : (
-          <span className="h-2 w-2 rounded-full bg-green-400" />
-        )}
-        {row.getValue('status')}
+      <div className="flex items-center gap-2">
+        <span className="flex items-center gap-2 capitalize">
+          {CardIcon(row.original.card.icon)}
+          {row.original.card.name}
+        </span>
       </div>
     ),
   },
-
-  {
-    accessorKey: 'Parcelas',
-    header: () => <div>Parcelas</div>,
-    cell: ({ row }) => (
-      <div className="capitalize">
-        {row.original.installments.length === 0
-          ? '1'
-          : row.original.installments.length}
-        x
-      </div>
-    ),
-  },
-
-  {
-    accessorKey: 'Vencimento',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Vencimento
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => (
-      <div className="lowercase">{formatDate(row.getValue('payDate'))}</div>
-    ),
-  },
-
-  {
-    accessorKey: 'cartão',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Cartão
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2 capitalize">
-        {CardIcon(row.original.card.icon)}
-        {row.original.card.name}
-      </div>
-    ),
-  },
-
   {
     id: 'actions',
-    enableHiding: false,
     cell: ({ row }) => {
       const transaction = row.original
-
-      const [, handleDeleteSubmit] = useFormState(
-        deleteTransactionAction,
-        () => {
-          toast.info(`Receita ${transaction.description} foi deletada!`, {
-            action: {
-              label: 'Dispensar',
-              onClick: () => toast.dismiss(),
-            },
-          })
-        },
-      )
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -219,21 +228,12 @@ export const columns: ColumnDef<GetTransactionsResponse>[] = [
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(transaction.id)}
             >
-              Pagar
+              Copiar ID
             </DropdownMenuItem>
-
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Abrir</DropdownMenuItem>
+            <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
             <DropdownMenuItem>Editar</DropdownMenuItem>
-            <DropdownMenuItem>
-              <form onSubmit={handleDeleteSubmit}>
-                <input name="transactionId" hidden value={transaction.id} />
-                <input name="walletId" hidden value={transaction.wallet.id} />
-                <button type="submit" className="p-0">
-                  Deletar
-                </button>
-              </form>
-            </DropdownMenuItem>
+            <DropdownMenuItem>Excluir</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -242,16 +242,28 @@ export const columns: ColumnDef<GetTransactionsResponse>[] = [
 ]
 
 export function TransactionsTable({ data }: TransactionTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
+  console.log('original', data)
+  const [currentDate, setCurrentDate] = useState(new Date())
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [rowSelection, setRowSelection] = useState({})
+
+  const filteredTransactions = useMemo(
+    () => filterTransactions(data, currentDate),
+    [currentDate],
   )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+
+  const handlePreviousMonth = () => {
+    setCurrentDate((prevDate) => subMonths(prevDate, 1))
+  }
+
+  const handleNextMonth = () => {
+    setCurrentDate((prevDate) => addMonths(prevDate, 1))
+  }
 
   const table = useReactTable({
-    data,
+    data: filteredTransactions,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -277,10 +289,10 @@ export function TransactionsTable({ data }: TransactionTableProps) {
           <Input
             placeholder="Encontrar receita..."
             value={
-              (table.getColumn('Titulo')?.getFilterValue() as string) ?? ''
+              (table.getColumn('description')?.getFilterValue() as string) ?? ''
             }
             onChange={(event) =>
-              table.getColumn('Titulo')?.setFilterValue(event.target.value)
+              table.getColumn('description')?.setFilterValue(event.target.value)
             }
             className="max-w-sm"
           />
@@ -296,14 +308,28 @@ export function TransactionsTable({ data }: TransactionTableProps) {
         </div>
 
         <div className="flex items-center gap-2 rounded-md border border-input bg-background">
-          <Button variant="ghost" size="sm" className="rounded-none">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="rounded-none"
+            onClick={handlePreviousMonth}
+          >
             <ArrowLeft />
           </Button>
-          <div className="flex flex-col items-center justify-center">
-            <span className="text-[10px] text-muted-foreground">2024</span>
-            <span className="text-[14px]">Novembro</span>
+          <div className="flex min-w-20 flex-col items-center justify-center">
+            <span className="text-[10px] text-muted-foreground">
+              {format(currentDate, 'yyyy', { locale: ptBR })}
+            </span>
+            <span className="text-[14px] capitalize">
+              {format(currentDate, 'MMMM', { locale: ptBR })}
+            </span>
           </div>
-          <Button variant="ghost" size="sm" className="rounded-none">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="rounded-none"
+            onClick={handleNextMonth}
+          >
             <ArrowRight />
           </Button>
         </div>

@@ -3,6 +3,7 @@ import {
   TransactionStatusType,
   TransactionType,
 } from '@prisma/client'
+import { format } from 'date-fns'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -33,7 +34,7 @@ export async function getTransactions(app: FastifyInstance) {
                 description: z.string(),
                 amount: z.number(),
                 type: z.nativeEnum(TransactionType),
-                payDate: z.date(),
+                payDate: z.string(),
                 status: z.nativeEnum(TransactionStatusType),
                 card: z.object({
                   id: z.string().uuid(),
@@ -51,8 +52,8 @@ export async function getTransactions(app: FastifyInstance) {
                       id: z.string().uuid(),
                       installment: z.number(),
                       status: z.nativeEnum(TransactionStatusType),
-                      payDate: z.date().nullish(),
-                      paidAt: z.date().nullish(),
+                      payDate: z.string().nullish(),
+                      paidAt: z.string().nullish(),
                     }),
                   )
                   .optional(),
@@ -117,7 +118,21 @@ export async function getTransactions(app: FastifyInstance) {
           },
         })
 
-        return reply.send(transactions)
+        const formattedTransactions = transactions.map((transaction) => ({
+          ...transaction,
+          payDate: format(new Date(transaction.payDate), 'yyyy/MM/dd'), // Formatação da data
+          installments: transaction.installments?.map((installment) => ({
+            ...installment,
+            payDate: installment.payDate
+              ? format(new Date(installment.payDate), 'yyyy/MM/dd')
+              : null, // Formatação da data das parcelas
+            paidAt: installment.paidAt
+              ? format(new Date(installment.paidAt), 'yyyy/MM/dd')
+              : null, // Formatação da data de pagamento
+          })),
+        }))
+
+        return reply.send(formattedTransactions)
       },
     )
 }

@@ -1,58 +1,24 @@
 import { api } from './api-client'
 
-type IconCardType =
-  | 'CARTEIRA'
-  | 'NUBANK'
-  | 'BB'
-  | 'ITAU'
-  | 'SICREDI'
-  | 'BRADESCO'
-  | 'SANTANDER'
-  | 'CAIXA'
-  | 'INTER'
-  | 'C6BANK'
-  | 'NEXT'
-  | 'NEON'
-  | 'PAN'
-  | 'PICPAY'
-  | 'INFINITYPAY'
-  | 'ITI'
-  | 'MERCADOPAGO'
-  | 'PAGSEGURO'
-
 type TransactionType = 'INCOME' | 'EXPENSE'
-type TransactionStatus = 'paid' | 'pending'
 
-interface CardType {
-  id: string
-  name: string
-  icon: IconCardType
-}
-
-interface WalletType {
-  id: string
-  name: string
-  slug: string
-}
-
-interface InstallmentsType {
-  id: string
-  installment: number
-  status: TransactionStatus
-  payDate?: string
-  paidAt?: string
-}
-
-export interface GetTransactionsResponse {
+export type GetTransactionsResponse = {
   id: string
   description: string
   amount: number
-  type: TransactionType
+  type: 'INCOME' | 'EXPENSE'
+  recurrence: 'VARIABLE' | 'MONTH' | 'YEAR'
   payDate: string
-  status: TransactionStatus
-  card: CardType
-  wallet: WalletType
-  installments: InstallmentsType[]
+  status: 'paid' | 'pending'
+  card: { id: string; name: string; icon: string }
+  wallet: { id: string; name: string; slug: string }
+  installments: Array<{
+    id: string
+    installment: number
+    status: 'paid' | 'pending'
+    payDate: string
+    paidAt?: string
+  }>
 }
 
 interface GetTransactionRequest {
