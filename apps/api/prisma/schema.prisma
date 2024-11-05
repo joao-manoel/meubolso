@@ -92,6 +92,7 @@ model User {
   Invite       Invite[]
   Token        Token[]
   Card         Card[]
+  Categorys    Categorys[]
 
   @@map("users")
 }
@@ -185,6 +186,7 @@ model Wallet {
 
   transaction Transaction[]
   card        Card[]
+  Categorys   Categorys[]
 
   @@map("wallets")
 }
@@ -210,7 +212,7 @@ model Transaction {
   id         String                @id @default(uuid())
   title      String
   amount     Int
-  type       TransactionType
+  type       TransactionType       @default(INCOME)
   recurrence RecurrenceType        @default(VARIABLE)
   payDate    DateTime              @map("pay_date")
   status     TransactionStatusType @default(pending)
@@ -246,12 +248,21 @@ model Installments {
 }
 
 model Categorys {
-  id    String @id @default(uuid())
-  title String
-  icon  String
-  slug  String
+  id              String          @id @default(uuid())
+  title           String
+  icon            String
+  transactionType TransactionType @map("transaction_type")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  isCategoryUser  Boolean         @default(false) @map("is_category_user")
 
-  Transaction Transaction[]
+  owner  User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String?
 
-  @@map("category")
+  wallet   Wallet? @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  walletId String?
+
+  transaction Transaction[]
+
+  @@map("categorys")
 }

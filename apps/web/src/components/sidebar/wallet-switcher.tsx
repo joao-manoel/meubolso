@@ -34,7 +34,7 @@ export async function WalletSwitcher({ wallets }: WalletSwitcherProps) {
           className="line-clamp-1 cursor-pointer gap-2 p-2"
           asChild
         >
-          <a href={`/dashboard/settings/wallets/select/${wallet.slug}`}>
+          <a href={`/dashboard/settings/wallets/select/${wallet.id}`}>
             {wallet.name}
           </a>
         </DropdownMenuItem>

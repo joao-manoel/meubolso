@@ -6,9 +6,9 @@ export function middleware(request: NextRequest) {
   const response = NextResponse.next()
 
   if (pathname.startsWith('/dashboard/settings/wallets/select')) {
-    const [, , , , , slug] = pathname.split('/')
+    const [, , , , , walletId] = pathname.split('/')
 
-    response.cookies.set('wallet', slug)
+    response.cookies.set('wallet', walletId)
   }
 
   return response

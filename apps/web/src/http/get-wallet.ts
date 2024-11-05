@@ -15,9 +15,9 @@ export interface GetWalletResponse {
   card: CardType[]
 }
 
-export async function getWallet(walletSlug: string) {
+export async function getWallet(walletId: string) {
   const result = await api
-    .get(`wallet/${walletSlug}`, {
+    .get(`wallet/${walletId}`, {
       next: {
         tags: ['wallet'],
       },

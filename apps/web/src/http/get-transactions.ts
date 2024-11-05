@@ -23,15 +23,15 @@ export type GetTransactionsResponse = {
 
 interface GetTransactionRequest {
   type: TransactionType
-  walletSlug: string
+  walletId: string
 }
 
 export async function getTransactions({
   type,
-  walletSlug,
+  walletId,
 }: GetTransactionRequest) {
   const result = await api
-    .get(`wallet/${walletSlug}/transactions/${type}`, {
+    .get(`wallet/${walletId}/transactions/${type}`, {
       next: {
         tags: ['transactions'],
       },

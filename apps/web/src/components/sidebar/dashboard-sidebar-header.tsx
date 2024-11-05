@@ -17,10 +17,10 @@ import { getWallets } from '@/http/get-wallets'
 import { WalletSwitcher } from './wallet-switcher'
 
 export async function DashboardSidebarHeader() {
-  const walletCookie = cookies().get('wallet')?.value
+  const walletId = cookies().get('wallet')?.value
   const wallets = await getWallets()
 
-  const currentWallet = wallets.find((wallet) => wallet.slug === walletCookie)
+  const currentWallet = wallets.find((wallet) => wallet.id === walletId)
 
   return (
     <SidebarHeader>
