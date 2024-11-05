@@ -1,8 +1,13 @@
 'use server'
+import { format } from 'date-fns'
+import { HTTPError } from 'ky'
 import { revalidateTag } from 'next/cache'
+import { cookies } from 'next/headers'
 import { z } from 'zod'
 
+import { createTransaction } from '@/http/create-transaction'
 import { deleteTransactions } from '@/http/delete-transaction'
+import { toCents } from '@/utils/utils'
 
 const deleteTransactionSchema = z.object({
   transactionId: z.string(),
@@ -34,9 +39,39 @@ const createIncomeActionSchema = z.object({
   categoryId: z.string(),
   payDate: z.string(),
   cardId: z.string(),
-  recurrence: z.string().optional(),
+  recurrence: z.enum(['VARIABLE', 'MONTH', 'YEAR']).optional(),
   installments: z.string().optional(),
 })
+
+function createInstallmentsArray(
+  numInstallments: string,
+  payDate: string,
+): Array<{
+  installment: number
+  status: 'pending' | 'paid' // ou outros estados que você definiu
+  payDate: string
+  paidAt?: string
+}> {
+  const installmentsArray = []
+  const totalInstallments = parseInt(numInstallments, 10)
+
+  const baseDate = new Date(payDate)
+
+  for (let i = 1; i <= totalInstallments; i++) {
+    const installmentDate = new Date(baseDate)
+    if (i > 1) {
+      installmentDate.setMonth(baseDate.getMonth() + i - 1)
+    }
+
+    installmentsArray.push({
+      installment: i,
+      status: 'pending' as 'pending' | 'paid',
+      payDate: format(installmentDate, 'yyyy-MM-dd'),
+    })
+  }
+
+  return installmentsArray
+}
 
 export async function createIncomeAction(data: FormData) {
   const result = createIncomeActionSchema.safeParse(Object.fromEntries(data))
@@ -47,7 +82,71 @@ export async function createIncomeAction(data: FormData) {
     return { success: false, message: null, errors }
   }
 
-  console.log(result)
+  const {
+    title,
+    amount,
+    categoryId,
+    payDate,
+    cardId,
+    recurrence,
+    installments,
+  } = result.data
 
-  return { success: false, message: null, errors: null }
+  const walletId = cookies().get('wallet')?.value
+
+  if (!walletId) {
+    return {
+      success: false,
+      message:
+        'Você precisa ter uma carteira ativa para realizar essa operação.',
+      errors: null,
+    }
+  }
+
+  try {
+    const transaction = await createTransaction({
+      walletId,
+      title,
+      amount: toCents(amount),
+      type: 'INCOME',
+      payDate,
+      ...(recurrence ? { recurrence } : { recurrence: 'VARIABLE' }),
+      categoryId,
+      cardId,
+      status: 'pending',
+      ...(installments && {
+        installments: createInstallmentsArray(installments, payDate),
+      }),
+    })
+
+    revalidateTag('transactions')
+
+    if (transaction) {
+      return {
+        success: true,
+        message: `Receita ${title} criada com sucesso!`,
+        errors: null,
+      }
+    }
+
+    return {
+      success: false,
+      message: `Não foi possível criar a receita ${title}. Tente novamente.`,
+      errors: null,
+    }
+  } catch (err) {
+    if (err instanceof HTTPError) {
+      const { message } = await err.response.json()
+
+      return { success: false, message, errors: null }
+    }
+
+    return {
+      success: false,
+      message: 'Unexpected error, try again in a few minutes.',
+      errors: null,
+    }
+
+    return { success: false, message: null, errors: null }
+  }
 }

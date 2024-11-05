@@ -1,9 +1,10 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-import { getCategorys } from '@/http/get-categorys'
 import { getTransactions } from '@/http/get-transactions'
+import { getTransactionsCategorys } from '@/http/get-transactions-categorys'
 import { getWallet } from '@/http/get-wallet'
+import { getWalletTransactionsCategorys } from '@/http/get-wallet-transactions-categorys'
 
 import { TransactionsTable } from '../transaction-table'
 
@@ -21,10 +22,16 @@ export default async function IncomesPage() {
 
   const wallet = await getWallet(walletId)
 
-  const categorys = await getCategorys({
+  const walletCategorys = await getWalletTransactionsCategorys({
     walletId,
     type: 'INCOME',
   })
+
+  const transactionsCategorys = await getTransactionsCategorys({
+    type: 'INCOME',
+  })
+
+  const categorys = [...walletCategorys, ...transactionsCategorys]
 
   return (
     <div className="space-y-2">

@@ -19,3 +19,16 @@ export function CalcParcelas(
 
   return Math.abs(difMeses) + 1
 }
+
+export function toCents(value: string): number {
+  // Remove o símbolo de moeda e espaços
+  const cleanValue = value.replace(/[R$\s]/g, '')
+
+  // Remove pontos de milhar e substitui a vírgula decimal por ponto
+  const numericValue = parseFloat(
+    cleanValue.replace(/\./g, '').replace(',', '.'),
+  )
+
+  // Converte para centavos
+  return Math.round(numericValue * 100)
+}

@@ -25,7 +25,12 @@ import { useMemo, useState } from 'react'
 import { CardIcon } from '@/components/CardIcon'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -44,8 +49,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { GetCategorysResponse } from '@/http/get-categorys'
 import { GetTransactionsResponse } from '@/http/get-transactions'
+import { GetTransactionsCategorysResponse } from '@/http/get-transactions-categorys'
 import { GetWalletResponse } from '@/http/get-wallet'
 
 import CreateIncomeForm from './incomes/create-income-form'
@@ -53,7 +58,7 @@ import CreateIncomeForm from './incomes/create-income-form'
 interface TransactionTableProps {
   data: GetTransactionsResponse[]
   wallet: GetWalletResponse
-  categorys: GetCategorysResponse[]
+  categorys: GetTransactionsCategorysResponse[]
 }
 
 type TransactionWithInstallmentInfo = GetTransactionsResponse & {
@@ -157,7 +162,7 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
       )
     },
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('amount')) / 10
+      const amount = parseFloat(row.getValue('amount')) / 100
       const formatted = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL',
@@ -245,7 +250,11 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
   },
 ]
 
-export function TransactionsTable({ data, wallet }: TransactionTableProps) {
+export function TransactionsTable({
+  data,
+  wallet,
+  categorys,
+}: TransactionTableProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -299,11 +308,14 @@ export function TransactionsTable({ data, wallet }: TransactionTableProps) {
           />
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline">Nova Receita</Button>
+              <Button variant="outline">Adicionar Receita</Button>
             </DialogTrigger>
 
             <DialogContent>
-              <CreateIncomeForm wallet={wallet} />
+              <DialogTitle>
+                <h1 className="text-2xl font-bold">Receita</h1>
+              </DialogTitle>
+              <CreateIncomeForm wallet={wallet} categorys={categorys} />
             </DialogContent>
           </Dialog>
         </div>

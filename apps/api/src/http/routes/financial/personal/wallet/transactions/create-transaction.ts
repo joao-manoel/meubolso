@@ -16,7 +16,7 @@ export async function createTransaction(app: FastifyInstance) {
     .withTypeProvider<ZodTypeProvider>()
     .register(auth)
     .post(
-      '/wallet/:walletId/transaction/',
+      '/wallet/:walletId/transaction',
       {
         schema: {
           tags: ['Transactions'],
@@ -37,9 +37,9 @@ export async function createTransaction(app: FastifyInstance) {
             installments: z
               .array(
                 z.object({
-                  installmente: z.number(),
+                  installment: z.number(),
                   status: z.nativeEnum(TransactionStatusType),
-                  payDate: z.string().optional(),
+                  payDate: z.string(),
                   paidAt: z.string().optional(),
                 }),
               )
@@ -112,8 +112,8 @@ export async function createTransaction(app: FastifyInstance) {
                 installments: {
                   create: installments.map((installment) => ({
                     status: installment.status,
-                    installment: installment.installmente,
-                    payDate: installment.payDate,
+                    installment: installment.installment,
+                    payDate: new Date(installment.payDate),
                     paidAt: installment.paidAt,
                   })),
                 },
@@ -125,6 +125,7 @@ export async function createTransaction(app: FastifyInstance) {
             transactionId: transaction.id,
           })
         } catch (err) {
+          console.log(err)
           throw new BadRequestError(
             'Unable to create transaction, please try again later!',
           )
