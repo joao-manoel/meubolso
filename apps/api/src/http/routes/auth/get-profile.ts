@@ -23,6 +23,7 @@ export async function getProfile(app: FastifyInstance) {
               user: z.object({
                 id: z.string(),
                 name: z.string().nullable(),
+                avatar: z.string().nullish(),
                 email: z.string().email().nullable(),
                 subscription: z.nativeEnum(SubscriptionType),
               }),
@@ -38,6 +39,7 @@ export async function getProfile(app: FastifyInstance) {
             id: true,
             name: true,
             email: true,
+            avatarUrl: true,
             subscription: true,
           },
           where: {
@@ -54,6 +56,7 @@ export async function getProfile(app: FastifyInstance) {
             id: user.id,
             name: user.name,
             email: user.email,
+            avatar: user.avatarUrl,
             subscription: user.subscription,
           },
         })

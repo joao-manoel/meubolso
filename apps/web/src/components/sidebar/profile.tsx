@@ -13,7 +13,7 @@ export async function Profile() {
   return (
     <>
       <Avatar className="h-8 w-8 rounded-lg">
-        <AvatarImage src="" alt="teste" />
+        <AvatarImage src={user.avatar} alt="teste" />
         <AvatarFallback className="rounded-lg">
           {getInitials(user.name)}
         </AvatarFallback>

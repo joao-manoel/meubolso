@@ -6,6 +6,7 @@ interface GetProfileResponse {
   user: {
     id: number
     name: string
+    avatar?: string
     email?: string | null
     subscription: SubscriptionType
   }
