@@ -46,7 +46,7 @@ import {
 } from '@/components/ui/table'
 import { GetTransactionsResponse } from '@/http/get-transactions'
 
-import CreateIncomeForm from './incomes/create-income-form'
+import Income from './incomes/Income'
 
 interface TransactionTableProps {
   data: GetTransactionsResponse[]
@@ -129,13 +129,13 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'description',
+    accessorKey: 'title',
     header: 'Título',
     cell: ({ row }) => (
       <div className="capitalize">
         {row.original.installmentInfo
-          ? `${row.getValue('description')} (Parcela ${row.original.installmentInfo.installment})`
-          : row.getValue('description')}
+          ? `${row.getValue('title')} (Parcela ${row.original.installmentInfo.installment})`
+          : row.getValue('title')}
       </div>
     ),
   },
@@ -242,7 +242,6 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
 ]
 
 export function TransactionsTable({ data }: TransactionTableProps) {
-  console.log('original', data)
   const [currentDate, setCurrentDate] = useState(new Date())
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -288,11 +287,9 @@ export function TransactionsTable({ data }: TransactionTableProps) {
         <div className="flex w-full gap-2">
           <Input
             placeholder="Encontrar receita..."
-            value={
-              (table.getColumn('description')?.getFilterValue() as string) ?? ''
-            }
+            value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
             onChange={(event) =>
-              table.getColumn('description')?.setFilterValue(event.target.value)
+              table.getColumn('title')?.setFilterValue(event.target.value)
             }
             className="max-w-sm"
           />
@@ -302,7 +299,7 @@ export function TransactionsTable({ data }: TransactionTableProps) {
             </DialogTrigger>
 
             <DialogContent>
-              <CreateIncomeForm />
+              <Income />
             </DialogContent>
           </Dialog>
         </div>

@@ -13,6 +13,7 @@ import { createAccount } from './routes/auth/create-account'
 import { getProfile } from './routes/auth/get-profile'
 import { createWallet } from './routes/financial/personal/wallet/create-wallet'
 import { deleteWallet } from './routes/financial/personal/wallet/delete-wallet'
+import { getWallet } from './routes/financial/personal/wallet/get-wallet'
 import { getWallets } from './routes/financial/personal/wallet/get-wallets'
 import { createTransaction } from './routes/financial/personal/wallet/transactions/create-transaction'
 import { deleteTransaction } from './routes/financial/personal/wallet/transactions/delete-transactions'
@@ -34,6 +35,7 @@ app.register(authenticateWithGoogle)
 app.register(getProfile)
 
 app.register(getWallets)
+app.register(getWallet)
 app.register(createWallet)
 app.register(deleteWallet)
 

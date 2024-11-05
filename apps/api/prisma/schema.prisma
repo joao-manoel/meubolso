@@ -183,8 +183,8 @@ model Wallet {
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   organizationId String?       @map("organization_id")
 
-  Transaction Transaction[]
-  Card        Card[]
+  transaction Transaction[]
+  card        Card[]
 
   @@map("wallets")
 }
@@ -207,13 +207,13 @@ model Card {
 }
 
 model Transaction {
-  id          String                @id @default(uuid())
-  description String
-  amount      Int
-  type        TransactionType
-  recurrence  RecurrenceType        @default(VARIABLE)
-  payDate     DateTime              @map("pay_date")
-  status      TransactionStatusType @default(pending)
+  id         String                @id @default(uuid())
+  title      String
+  amount     Int
+  type       TransactionType
+  recurrence RecurrenceType        @default(VARIABLE)
+  payDate    DateTime              @map("pay_date")
+  status     TransactionStatusType @default(pending)
 
   category   Categorys @relation(fields: [categoryId], references: [id])
   categoryId String

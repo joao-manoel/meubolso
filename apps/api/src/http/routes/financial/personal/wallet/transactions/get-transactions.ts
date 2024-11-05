@@ -31,7 +31,7 @@ export async function getTransactions(app: FastifyInstance) {
             200: z.array(
               z.object({
                 id: z.string().uuid(),
-                description: z.string(),
+                title: z.string(),
                 amount: z.number(),
                 type: z.nativeEnum(TransactionType),
                 payDate: z.string(),
@@ -80,7 +80,7 @@ export async function getTransactions(app: FastifyInstance) {
         const transactions = await prisma.transaction.findMany({
           select: {
             id: true,
-            description: true,
+            title: true,
             status: true,
             amount: true,
             type: true,

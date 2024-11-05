@@ -4,7 +4,7 @@ type TransactionType = 'INCOME' | 'EXPENSE'
 
 export type GetTransactionsResponse = {
   id: string
-  description: string
+  title: string
   amount: number
   type: 'INCOME' | 'EXPENSE'
   recurrence: 'VARIABLE' | 'MONTH' | 'YEAR'

@@ -26,7 +26,7 @@ export async function createTransaction(app: FastifyInstance) {
             walletId: z.string().uuid(),
           }),
           body: z.object({
-            description: z.string(),
+            title: z.string(),
             amount: z.number(),
             type: z.nativeEnum(TransactionType),
             payDate: z.string(),
@@ -58,7 +58,7 @@ export async function createTransaction(app: FastifyInstance) {
         const { walletId } = request.params
 
         const {
-          description,
+          title,
           amount,
           payDate,
           cardId,
@@ -99,7 +99,7 @@ export async function createTransaction(app: FastifyInstance) {
 
           const transaction = await prisma.transaction.create({
             data: {
-              description,
+              title,
               amount,
               status,
               payDate: payDateObj,

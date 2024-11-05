@@ -1,8 +1,10 @@
+'use client'
 import { format, startOfToday } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { CalendarIcon } from 'lucide-react'
+import { AlertTriangle, CalendarIcon, Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Input } from '@/components/ui/input'
@@ -19,18 +21,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useFormState } from '@/hooks/use-form-state'
+import { CardType } from '@/http/get-wallet'
 import { cn } from '@/lib/utils'
 
-export default function CreateIncomeForm() {
+import { createIncomeAction } from './action'
+
+interface CreateIncomeFormProps {
+  UserCard: CardType[]
+}
+
+export default function CreateIncomeForm({ UserCard }: CreateIncomeFormProps) {
+  const [title, setTitle] = useState('')
   const [amount, setAmount] = useState('')
-  const [date, setDate] = useState<Date | undefined>(startOfToday())
+  const [date, setDate] = useState<Date>(startOfToday())
   const [category, setCategory] = useState('')
   const [card, setCard] = useState('')
   const [entryType, setEntryType] = useState<
     'variable' | 'recorrente' | 'parcelado'
   >('variable')
-  const [recurrenceType, setRecurrenceType] = useState<'mensal' | 'anual'>(
-    'mensal',
+  const [recurrenceType, setRecurrenceType] = useState<'MONTH' | 'YEAR'>(
+    'MONTH',
   )
   const [installments, setInstallments] = useState<number>(1)
 
@@ -78,20 +89,53 @@ export default function CreateIncomeForm() {
     setDate(selectedDate || startOfToday())
   }
 
+  const [{ errors, message, success }, handleSubmit, isPending] = useFormState(
+    createIncomeAction,
+    () => {
+      console.log('ok')
+    },
+  )
+
   return (
     <div>
       <header>
         <h1 className="text-2xl font-bold">Receita</h1>
       </header>
-      <form className="flex flex-col gap-4 py-2.5">
+      {success === false && message && (
+        <Alert variant="destructive">
+          <AlertTriangle className="size-4" />
+          <AlertTitle>Ops! não foi possivel criar sua carteira!</AlertTitle>
+          <AlertDescription>
+            <p>{message}</p>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {success === true && message && (
+        <Alert variant="default">
+          <AlertTriangle className="size-4" />
+          <AlertTitle>Carteira criada com sucesso!</AlertTitle>
+          <AlertDescription>
+            <p>{message}</p>
+          </AlertDescription>
+        </Alert>
+      )}
+      <form className="flex flex-col gap-4 py-2.5" onSubmit={handleSubmit}>
         <div className="grid grid-cols-[70%_minmax(30%,_1fr)] gap-3">
           <div className="gap-2 space-y-2">
             <Label htmlFor="title">Titulo</Label>
             <Input
               placeholder="Digite um titulo"
-              name="description"
+              onChange={(e) => setTitle(e.target.value)}
+              name="title"
               id="title"
+              value={title}
             />
+            {errors?.title && (
+              <p className="text-xs font-medium text-red-500 dark:text-red-400">
+                {errors.title[0]}
+              </p>
+            )}
           </div>
           <div className="gap-2 space-y-2">
             <Label htmlFor="amount">Valor</Label>
@@ -102,6 +146,11 @@ export default function CreateIncomeForm() {
               onChange={handleAmountChange}
               placeholder="R$ 0,00"
             />
+            {errors?.amount && (
+              <p className="text-xs font-medium text-red-500 dark:text-red-400">
+                {errors.amount[0]}
+              </p>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-[50%_minmax(50%,_1fr)] gap-2">
@@ -110,6 +159,7 @@ export default function CreateIncomeForm() {
             <Select
               value={category}
               onValueChange={(value) => setCategory(value)}
+              name="categoryId"
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecione uma categoria" />
@@ -119,9 +169,22 @@ export default function CreateIncomeForm() {
                 <SelectItem value="freelance">Freelance</SelectItem>
               </SelectContent>
             </Select>
+            {errors?.categoryId && (
+              <p className="text-xs font-medium text-red-500 dark:text-red-400">
+                {errors.categoryId[0]}
+              </p>
+            )}
           </div>
           <div className="space-y-2">
             <Label>Vencimento</Label>
+            <input
+              type="text"
+              hidden
+              value={format(date, 'yyyy/MM/dd', {
+                locale: ptBR,
+              })}
+              name="payDate"
+            />
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -156,15 +219,27 @@ export default function CreateIncomeForm() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="category">Cartão</Label>
-          <Select value={card} onValueChange={(value) => setCard(value)}>
+          <Select
+            value={card}
+            onValueChange={(value) => setCard(value)}
+            name="cardId"
+          >
             <SelectTrigger>
               <SelectValue placeholder="Selecione um cartão" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="nubank">Nubank</SelectItem>
-              <SelectItem value="bb">Banco do Brasil</SelectItem>
+              {UserCard.map((card) => (
+                <SelectItem value={card.id} key={card.id}>
+                  {card.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
+          {errors?.cardId && (
+            <p className="text-xs font-medium text-red-500 dark:text-red-400">
+              {errors.cardId[0]}
+            </p>
+          )}
         </div>
         <div className="flex flex-col gap-4">
           <div className="space-y-2">
@@ -199,9 +274,10 @@ export default function CreateIncomeForm() {
               <Label htmlFor="recurrenceType">Tipo de Recorrência</Label>
               <Select
                 value={recurrenceType}
-                onValueChange={(value: 'mensal' | 'anual') =>
+                onValueChange={(value: 'MONTH' | 'YEAR') =>
                   setRecurrenceType(value)
                 }
+                name="recurrence"
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecione o tipo de recorrência" />
@@ -221,6 +297,7 @@ export default function CreateIncomeForm() {
                   <Select
                     value={installments.toString()}
                     onValueChange={(value) => setInstallments(parseInt(value))}
+                    name="installments"
                   >
                     <SelectTrigger className="">
                       <SelectValue placeholder="Selecione o número de parcelas" />
@@ -244,7 +321,13 @@ export default function CreateIncomeForm() {
           )}
         </div>
         <div className="w-full">
-          <Button className="w-full">Adicionar</Button>
+          <Button className="w-full">
+            {isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              'Adicionar'
+            )}
+          </Button>
         </div>
       </form>
     </div>
