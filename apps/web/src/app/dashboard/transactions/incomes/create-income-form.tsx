@@ -4,6 +4,7 @@ import { ptBR } from 'date-fns/locale'
 import { AlertTriangle, CalendarIcon, Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
+import { CardIcon } from '@/components/CardIcon'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -22,16 +23,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useFormState } from '@/hooks/use-form-state'
-import { CardType } from '@/http/get-wallet'
+import { GetWalletResponse } from '@/http/get-wallet'
 import { cn } from '@/lib/utils'
 
 import { createIncomeAction } from './action'
 
-interface CreateIncomeFormProps {
-  UserCard: CardType[]
+export interface CreateIncomeFormProps {
+  wallet: GetWalletResponse
 }
 
-export default function CreateIncomeForm({ UserCard }: CreateIncomeFormProps) {
+export default function CreateIncomeForm({ wallet }: CreateIncomeFormProps) {
   const [title, setTitle] = useState('')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState<Date>(startOfToday())
@@ -219,22 +220,36 @@ export default function CreateIncomeForm({ UserCard }: CreateIncomeFormProps) {
         </div>
         <div className="space-y-2">
           <Label htmlFor="category">Cartão</Label>
-          <Select
-            value={card}
-            onValueChange={(value) => setCard(value)}
-            name="cardId"
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione um cartão" />
-            </SelectTrigger>
-            <SelectContent>
-              {UserCard.map((card) => (
-                <SelectItem value={card.id} key={card.id}>
-                  {card.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {wallet.card ? (
+            <Select
+              value={card}
+              onValueChange={(value) => setCard(value)}
+              name="cardId"
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione um cartão" />
+              </SelectTrigger>
+              <SelectContent>
+                {wallet.card.map((card) => (
+                  <SelectItem value={card.id} key={card.id}>
+                    <div className="flex gap-2">
+                      <span>{CardIcon(card.icon)}</span>
+                      <span>{card.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <span className="text-center text-sm">
+                Você não tem nenhum cartão cadastrado!
+              </span>
+              <Button variant="secondary" size="sm">
+                Cadastrar um novo cartão
+              </Button>
+            </div>
+          )}
           {errors?.cardId && (
             <p className="text-xs font-medium text-red-500 dark:text-red-400">
               {errors.cardId[0]}

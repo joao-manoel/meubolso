@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { getTransactions } from '@/http/get-transactions'
+import { getWallet } from '@/http/get-wallet'
 
 import { TransactionsTable } from '../transaction-table'
 
@@ -17,9 +18,11 @@ export default async function IncomesPage() {
     walletSlug,
   })
 
+  const wallet = await getWallet(walletSlug)
+
   return (
     <div className="space-y-2">
-      <TransactionsTable data={transactions} />
+      <TransactionsTable data={transactions} wallet={wallet} />
     </div>
   )
 }

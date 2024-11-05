@@ -7,7 +7,7 @@ export interface CardType {
   limit: number
 }
 
-export interface GetWalletsResponse {
+export interface GetWalletResponse {
   id: string
   name: string
   slug: string
@@ -22,7 +22,7 @@ export async function getWallet(walletSlug: string) {
         tags: ['wallet'],
       },
     })
-    .json<GetWalletsResponse>()
+    .json<GetWalletResponse>()
 
   return result
 }

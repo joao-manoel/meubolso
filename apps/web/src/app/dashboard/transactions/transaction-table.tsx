@@ -45,11 +45,13 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { GetTransactionsResponse } from '@/http/get-transactions'
+import { GetWalletResponse } from '@/http/get-wallet'
 
-import Income from './incomes/Income'
+import CreateIncomeForm from './incomes/create-income-form'
 
 interface TransactionTableProps {
   data: GetTransactionsResponse[]
+  wallet: GetWalletResponse
 }
 
 type TransactionWithInstallmentInfo = GetTransactionsResponse & {
@@ -241,7 +243,7 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
   },
 ]
 
-export function TransactionsTable({ data }: TransactionTableProps) {
+export function TransactionsTable({ data, wallet }: TransactionTableProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -299,7 +301,7 @@ export function TransactionsTable({ data }: TransactionTableProps) {
             </DialogTrigger>
 
             <DialogContent>
-              <Income />
+              <CreateIncomeForm wallet={wallet} />
             </DialogContent>
           </Dialog>
         </div>
