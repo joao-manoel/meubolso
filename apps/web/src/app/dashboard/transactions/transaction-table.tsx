@@ -44,6 +44,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { GetCategorysResponse } from '@/http/get-categorys'
 import { GetTransactionsResponse } from '@/http/get-transactions'
 import { GetWalletResponse } from '@/http/get-wallet'
 
@@ -52,6 +53,7 @@ import CreateIncomeForm from './incomes/create-income-form'
 interface TransactionTableProps {
   data: GetTransactionsResponse[]
   wallet: GetWalletResponse
+  categorys: GetCategorysResponse[]
 }
 
 type TransactionWithInstallmentInfo = GetTransactionsResponse & {

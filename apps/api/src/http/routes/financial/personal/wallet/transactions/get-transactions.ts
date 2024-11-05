@@ -17,14 +17,14 @@ export async function getTransactions(app: FastifyInstance) {
     .withTypeProvider<ZodTypeProvider>()
     .register(auth)
     .get(
-      '/wallet/:walletSlug/transactions/:type',
+      '/wallet/:walletId/transactions/:type',
       {
         schema: {
           tags: ['Transactions'],
           summary: 'Get personal wallet transactions',
           security: [{ bearerAuth: [] }],
           params: z.object({
-            walletSlug: z.string(),
+            walletId: z.string(),
             type: z.nativeEnum(TransactionType),
           }),
           response: {
@@ -64,11 +64,11 @@ export async function getTransactions(app: FastifyInstance) {
       },
       async (request, reply) => {
         const userId = await request.getCurrentUserId()
-        const { walletSlug, type } = request.params
+        const { walletId, type } = request.params
 
         const wallet = await prisma.wallet.findFirst({
           where: {
-            slug: walletSlug,
+            id: walletId,
             ownerId: userId,
           },
         })
