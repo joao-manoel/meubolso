@@ -11,6 +11,7 @@ import {
 import { authenticateWithGoogle } from './routes/auth/authenticate-with-google'
 import { createAccount } from './routes/auth/create-account'
 import { getProfile } from './routes/auth/get-profile'
+import { getCategorys } from './routes/financial/personal/wallet/categorys/get-categorys'
 import { createWallet } from './routes/financial/personal/wallet/create-wallet'
 import { deleteWallet } from './routes/financial/personal/wallet/delete-wallet'
 import { getWallet } from './routes/financial/personal/wallet/get-wallet'
@@ -42,6 +43,8 @@ app.register(deleteWallet)
 app.register(getTransactions)
 app.register(deleteTransaction)
 app.register(createTransaction)
+
+app.register(getCategorys)
 
 app.listen({ port: env.SERVER_PORT }).then(() => {
   console.log(`🔥 Server listening on ${env.SERVER_PORT}`)
