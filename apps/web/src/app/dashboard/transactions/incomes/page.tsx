@@ -33,6 +33,8 @@ export default async function IncomesPage() {
 
   const categorys = [...walletCategorys, ...transactionsCategorys]
 
+  console.log(transactions)
+
   return (
     <div className="space-y-2">
       <TransactionsTable

@@ -1,5 +1,6 @@
 import {
   IconCardType,
+  RecurrenceType,
   TransactionStatusType,
   TransactionType,
 } from '@prisma/client'
@@ -35,6 +36,7 @@ export async function getTransactions(app: FastifyInstance) {
                 amount: z.number(),
                 type: z.nativeEnum(TransactionType),
                 payDate: z.string(),
+                recurrence: z.nativeEnum(RecurrenceType),
                 status: z.nativeEnum(TransactionStatusType),
                 card: z.object({
                   id: z.string().uuid(),
@@ -83,6 +85,7 @@ export async function getTransactions(app: FastifyInstance) {
             title: true,
             status: true,
             amount: true,
+            recurrence: true,
             type: true,
             payDate: true,
             card: {
