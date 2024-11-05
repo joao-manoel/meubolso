@@ -5,6 +5,7 @@ import { AlertTriangle, CalendarIcon, Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { CardIcon } from '@/components/CardIcon'
+import { CategoryIcon } from '@/components/IconCategorys'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -22,7 +23,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import { useFormState } from '@/hooks/use-form-state'
+import { GetTransactionsCategorysResponse } from '@/http/get-transactions-categorys'
 import { GetWalletResponse } from '@/http/get-wallet'
 import { cn } from '@/lib/utils'
 
@@ -30,9 +33,13 @@ import { createIncomeAction } from './action'
 
 export interface CreateIncomeFormProps {
   wallet: GetWalletResponse
+  categorys: GetTransactionsCategorysResponse[]
 }
 
-export default function CreateIncomeForm({ wallet }: CreateIncomeFormProps) {
+export default function CreateIncomeForm({
+  wallet,
+  categorys,
+}: CreateIncomeFormProps) {
   const [title, setTitle] = useState('')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState<Date>(startOfToday())
@@ -93,19 +100,30 @@ export default function CreateIncomeForm({ wallet }: CreateIncomeFormProps) {
   const [{ errors, message, success }, handleSubmit, isPending] = useFormState(
     createIncomeAction,
     () => {
-      console.log('ok')
+      setTitle('')
+      setAmount('')
+      setDate(startOfToday())
+      setCategory('')
+      setCard('')
+      setEntryType('variable')
+      setRecurrenceType('MONTH')
+      setInstallments(1)
     },
+  )
+
+  const userTransactionCategorys = categorys.filter(
+    (c) => c.isCategoryUser === true,
+  )
+  const transactionGlobalCategorys = categorys.filter(
+    (c) => c.isCategoryUser === false,
   )
 
   return (
     <div>
-      <header>
-        <h1 className="text-2xl font-bold">Receita</h1>
-      </header>
       {success === false && message && (
         <Alert variant="destructive">
           <AlertTriangle className="size-4" />
-          <AlertTitle>Ops! não foi possivel criar sua carteira!</AlertTitle>
+          <AlertTitle>Ops! não foi possivel criar sua receita!</AlertTitle>
           <AlertDescription>
             <p>{message}</p>
           </AlertDescription>
@@ -115,7 +133,7 @@ export default function CreateIncomeForm({ wallet }: CreateIncomeFormProps) {
       {success === true && message && (
         <Alert variant="default">
           <AlertTriangle className="size-4" />
-          <AlertTitle>Carteira criada com sucesso!</AlertTitle>
+          <AlertTitle>Receita criada com sucesso!</AlertTitle>
           <AlertDescription>
             <p>{message}</p>
           </AlertDescription>
@@ -166,8 +184,37 @@ export default function CreateIncomeForm({ wallet }: CreateIncomeFormProps) {
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="salario">Salario</SelectItem>
-                <SelectItem value="freelance">Freelance</SelectItem>
+                {userTransactionCategorys.length >= 1 && (
+                  <>
+                    {userTransactionCategorys.map((c) => (
+                      <SelectItem
+                        value={c.id}
+                        key={c.id}
+                        className="flex gap-2"
+                      >
+                        <div className="flex items-center gap-2">
+                          <CategoryIcon icon={c.icon} size={15} />
+                          <span>{c.title}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+                {userTransactionCategorys && (
+                  <>
+                    <div className="flex justify-center">
+                      <Separator />
+                    </div>
+                    {transactionGlobalCategorys.map((c) => (
+                      <SelectItem value={c.id} key={c.id}>
+                        <div className="flex items-center gap-2">
+                          <CategoryIcon icon={c.icon} size={15} />
+                          <span>{c.title}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
               </SelectContent>
             </Select>
             {errors?.categoryId && (
@@ -298,8 +345,8 @@ export default function CreateIncomeForm({ wallet }: CreateIncomeFormProps) {
                   <SelectValue placeholder="Selecione o tipo de recorrência" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="mensal">Mensal</SelectItem>
-                  <SelectItem value="anual">Anual</SelectItem>
+                  <SelectItem value="MONTH">Mensal</SelectItem>
+                  <SelectItem value="YEAR">Anual</SelectItem>
                 </SelectContent>
               </Select>
             </div>
