@@ -62,7 +62,7 @@ import { GetTransactionsResponse } from '@/http/get-transactions'
 import { GetTransactionsCategorysResponse } from '@/http/get-transactions-categorys'
 import { GetWalletResponse } from '@/http/get-wallet'
 
-import CreateIncomeForm from './incomes/create-income-form'
+import CreateIncomeForm from '../app/dashboard/transactions/incomes/create-income-form'
 
 interface TransactionTableProps {
   data: GetTransactionsResponse[]

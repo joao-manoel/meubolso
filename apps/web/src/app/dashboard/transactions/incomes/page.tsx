@@ -6,7 +6,7 @@ import { getTransactionsCategorys } from '@/http/get-transactions-categorys'
 import { getWallet } from '@/http/get-wallet'
 import { getWalletTransactionsCategorys } from '@/http/get-wallet-transactions-categorys'
 
-import { TransactionsTable } from '../transaction-table'
+import { TransactionsTable } from '../../../../components/transaction-table'
 
 export default async function IncomesPage() {
   const walletId = cookies().get('wallet')?.value
