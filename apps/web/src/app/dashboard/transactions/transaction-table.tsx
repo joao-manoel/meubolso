@@ -66,6 +66,7 @@ type TransactionWithInstallmentInfo = GetTransactionsResponse & {
     id: string
     installment: number
     status: 'paid' | 'pending'
+    isRecurring: boolean
     payDate: string
     paidAt?: string
   }
@@ -80,9 +81,35 @@ const filterTransactions = (
     const isSameMonth = transactionDate.getMonth() === currentDate.getMonth()
     const isSameYear =
       transactionDate.getFullYear() === currentDate.getFullYear()
+    const isAfterOrSameAsPayDate =
+      currentDate.getFullYear() > transactionDate.getFullYear() ||
+      (currentDate.getFullYear() === transactionDate.getFullYear() &&
+        currentDate.getMonth() >= transactionDate.getMonth())
 
-    // Handle installments
-    if (transaction.installments.length > 0) {
+    // Verificar se há um installment recorrente pago para o mês atual
+    const recurringInstallment = transaction.installments.find(
+      (installment) =>
+        installment.isRecurring &&
+        new Date(installment.payDate).getMonth() === currentDate.getMonth() &&
+        new Date(installment.payDate).getFullYear() ===
+          currentDate.getFullYear(),
+    )
+
+    if (recurringInstallment) {
+      return [
+        {
+          ...transaction,
+          amount: transaction.amount,
+          installmentInfo: recurringInstallment,
+        },
+      ]
+    }
+
+    // Exibir installments específicos para transações não-recorrentes (não são MONTH ou YEAR)
+    if (
+      transaction.recurrence === 'VARIABLE' &&
+      transaction.installments.length > 0
+    ) {
       return transaction.installments
         .filter((installment) => {
           const installmentDate = new Date(installment.payDate)
@@ -98,16 +125,20 @@ const filterTransactions = (
         }))
     }
 
-    // Handle non-installment transactions
+    // Exibir a transação pai se não houver installment pago para o mês atual
     switch (transaction.recurrence) {
       case 'VARIABLE':
+        // Exibir apenas no mês e ano exatos do `payDate` sem recorrência ou parcelas
         return isSameMonth && isSameYear ? [transaction] : []
+
       case 'MONTH':
-        return isSameMonth ? [transaction] : []
+        // Exibir a transação pai a partir do `payDate` para todos os meses subsequentes
+        return isAfterOrSameAsPayDate ? [transaction] : []
+
       case 'YEAR':
-        return transactionDate.getMonth() === currentDate.getMonth()
-          ? [transaction]
-          : []
+        // Exibir a transação pai apenas no mês de `payDate` para anos subsequentes
+        return isSameMonth && isAfterOrSameAsPayDate ? [transaction] : []
+
       default:
         return []
     }
@@ -143,7 +174,7 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
     cell: ({ row }) => (
       <div className="capitalize">
         {row.original.installmentInfo
-          ? `${row.getValue('title')} (Parcela ${row.original.installmentInfo.installment})`
+          ? `${row.getValue('title')} ${row.original.recurrence === 'VARIABLE' ? `(Parcela ${row.original.installmentInfo.installment})` : ''}`
           : row.getValue('title')}
       </div>
     ),
@@ -163,6 +194,7 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
     },
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('amount')) / 100
+
       const formatted = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL',
@@ -172,7 +204,7 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
   },
   {
     accessorKey: 'status',
-    header: 'Status',
+    header: 'Status de Pagamento',
     cell: ({ row }) => {
       const status =
         row.original.installmentInfo?.status || row.getValue('status')
@@ -193,7 +225,7 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
     header: 'Parcelas',
     cell: ({ row }) => {
       const installmentInfo = row.original.installmentInfo
-      if (installmentInfo) {
+      if (installmentInfo && installmentInfo.isRecurring === false) {
         return `${installmentInfo.installment}/${row.original.installments.length}`
       }
       return '1x'

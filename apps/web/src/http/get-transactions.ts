@@ -16,6 +16,7 @@ export type GetTransactionsResponse = {
     id: string
     installment: number
     status: 'paid' | 'pending'
+    isRecurring: boolean
     payDate: string
     paidAt?: string
   }>

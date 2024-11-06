@@ -238,6 +238,7 @@ model Installments {
   id          String                @id @default(uuid())
   installment Int
   status      TransactionStatusType
+  isRecurring Boolean               @default(false) @map("is_recurring")
   payDate     DateTime?             @map("pay_date")
   paidAt      DateTime?             @map("paid_at")
 
