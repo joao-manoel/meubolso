@@ -300,7 +300,7 @@ export function TransactionsTable({
 
   const filteredTransactions = useMemo(
     () => filterTransactions(data, currentDate),
-    [currentDate],
+    [data, currentDate],
   )
 
   const handlePreviousMonth = () => {

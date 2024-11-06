@@ -124,8 +124,6 @@ export async function getTransactions(app: FastifyInstance) {
           },
         })
 
-        console.log(transactions[0].installments)
-
         const timeZone = 'UTC' // Definindo UTC para consistência
 
         const formattedTransactions = transactions.map((transaction) => ({

@@ -19,7 +19,7 @@ export async function getWallet(walletId: string) {
   const result = await api
     .get(`wallet/${walletId}`, {
       next: {
-        tags: ['wallet'],
+        tags: [`${walletId}/wallet`],
       },
     })
     .json<GetWalletResponse>()

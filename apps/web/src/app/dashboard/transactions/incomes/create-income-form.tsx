@@ -311,6 +311,7 @@ export default function CreateIncomeForm({
                 type="button"
                 variant={entryType === 'variable' ? 'default' : 'outline'}
                 onClick={() => setEntryType('variable')}
+                className="w-full"
               >
                 Único
               </Button>
@@ -318,6 +319,7 @@ export default function CreateIncomeForm({
                 type="button"
                 variant={entryType === 'recorrente' ? 'default' : 'outline'}
                 onClick={() => setEntryType('recorrente')}
+                className="w-full"
               >
                 Recorrente
               </Button>
@@ -325,6 +327,7 @@ export default function CreateIncomeForm({
                 type="button"
                 variant={entryType === 'parcelado' ? 'default' : 'outline'}
                 onClick={() => setEntryType('parcelado')}
+                className="w-full"
               >
                 Parcelado
               </Button>

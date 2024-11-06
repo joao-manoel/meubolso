@@ -11,21 +11,23 @@ import { TransactionsTable } from '../transaction-table'
 export default async function IncomesPage() {
   const walletId = cookies().get('wallet')?.value
 
-  if (!walletId && walletId !== 'null' && walletId !== 'undefined') {
+  if (!walletId) {
     redirect('/dashboard')
   }
 
   try {
     const [transactions, wallet, walletCategorys, transactionsCategorys] =
       await Promise.all([
-        getTransactions({ type: 'INCOME', walletId }),
+        getTransactions({
+          type: 'INCOME',
+          walletId,
+        }),
         getWallet(walletId),
         getWalletTransactionsCategorys({ walletId, type: 'INCOME' }),
         getTransactionsCategorys({ type: 'INCOME' }),
       ])
 
     const categorys = [...walletCategorys, ...transactionsCategorys]
-
     return (
       <div className="space-y-2">
         <TransactionsTable

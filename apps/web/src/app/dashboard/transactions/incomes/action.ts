@@ -29,7 +29,8 @@ export async function deleteTransactionAction(data: FormData) {
     walletId,
     transactionId,
   })
-  revalidateTag('transactions')
+
+  revalidateTag(`${walletId}/transactions`)
 
   return { success: true, message: null, errors: null }
 }
@@ -119,7 +120,7 @@ export async function createIncomeAction(data: FormData) {
       }),
     })
 
-    revalidateTag('transactions')
+    revalidateTag(`${walletId}/transactions`)
 
     if (transaction) {
       return {

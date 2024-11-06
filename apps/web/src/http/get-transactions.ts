@@ -34,7 +34,7 @@ export async function getTransactions({
   const result = await api
     .get(`wallet/${walletId}/transactions/${type}`, {
       next: {
-        tags: ['transactions'],
+        tags: [`${walletId}/transactions`],
       },
     })
     .json<GetTransactionsResponse[]>()

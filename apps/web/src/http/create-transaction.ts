@@ -49,9 +49,6 @@ export async function createTransaction({
         status,
         ...(installments && { installments }),
       },
-      next: {
-        tags: ['transactions'],
-      },
     })
     .json<CreateTransactionResponse>()
 

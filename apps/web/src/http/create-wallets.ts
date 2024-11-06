@@ -18,9 +18,6 @@ export async function createWallet({ name, type }: CreateWalletRequest) {
         name,
         ...(type && { type }),
       },
-      next: {
-        tags: ['wallets'],
-      },
     })
     .json<CreateWalletResponse>()
 
