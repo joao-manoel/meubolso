@@ -63,6 +63,17 @@ import { GetTransactionsCategorysResponse } from '@/http/get-transactions-catego
 import { GetWalletResponse } from '@/http/get-wallet'
 
 import CreateIncomeForm from '../app/dashboard/transactions/incomes/create-income-form'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from './ui/alert-dialog'
 
 interface TransactionTableProps {
   data: GetTransactionsResponse[]
@@ -87,7 +98,6 @@ const filterTransactions = (
 ): TransactionWithInstallmentInfo[] => {
   return transactions.flatMap((transaction) => {
     const transactionDate = new Date(transaction.payDate)
-    transactionDate.setHours(12)
     const isSameMonth = transactionDate.getMonth() === currentDate.getMonth()
     const isSameYear =
       transactionDate.getFullYear() === currentDate.getFullYear()
@@ -96,11 +106,9 @@ const filterTransactions = (
       (currentDate.getFullYear() === transactionDate.getFullYear() &&
         currentDate.getMonth() >= transactionDate.getMonth())
 
-    // Verificar se há um installment recorrente pago para o mês atual
     const recurringInstallment = transaction.installments.find(
       (installment) => {
         const installmentDate = new Date(installment.payDate)
-        installmentDate.setHours(12)
         return (
           installment.isRecurring &&
           installmentDate.getMonth() === currentDate.getMonth() &&
@@ -119,7 +127,6 @@ const filterTransactions = (
       ]
     }
 
-    // Exibir installments específicos para transações não-recorrentes (não são MONTH ou YEAR)
     if (
       transaction.recurrence === 'VARIABLE' &&
       transaction.installments.length > 0
@@ -139,18 +146,14 @@ const filterTransactions = (
         }))
     }
 
-    // Exibir a transação pai se não houver installment pago para o mês atual
     switch (transaction.recurrence) {
       case 'VARIABLE':
-        // Exibir apenas no mês e ano exatos do `payDate` sem recorrência ou parcelas
         return isSameMonth && isSameYear ? [transaction] : []
 
       case 'MONTH':
-        // Exibir a transação pai a partir do `payDate` para todos os meses subsequentes
         return isAfterOrSameAsPayDate ? [transaction] : []
 
       case 'YEAR':
-        // Exibir a transação pai apenas no mês de `payDate` para anos subsequentes
         return isSameMonth && isAfterOrSameAsPayDate ? [transaction] : []
 
       default:
@@ -294,7 +297,42 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
             <DropdownMenuItem>Editar</DropdownMenuItem>
-            <DropdownMenuItem>Excluir</DropdownMenuItem>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  Excluir
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Deletar {transaction.title}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta ação não poderá ser desfeita. Ela irá excluir
+                    permanentemente sua transação.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    asChild
+                    className="bg-transparent p-0 hover:bg-transparent"
+                  >
+                    <form>
+                      <Button
+                        variant="destructive"
+                        type="submit"
+                        className="w-full"
+                      >
+                        Excluir
+                      </Button>
+                    </form>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -346,7 +384,7 @@ export function TransactionsTable({
   })
 
   return (
-    <div className="w-full p-2">
+    <div className="relative w-full p-2">
       <h1 className="text-2xl font-bold">Receitas</h1>
       <div className="flex items-center gap-2 py-4">
         <div className="flex w-full gap-2">
@@ -370,35 +408,36 @@ export function TransactionsTable({
               <CreateIncomeForm wallet={wallet} categorys={categorys} />
             </DialogContent>
           </Dialog>
-          {table.getFilteredSelectedRowModel().rows.length >= 1 && (
-            <div className="flex gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Button variant="outline" size="sm">
-                      <Check />
-                    </Button>
-                    <TooltipContent align="center">
-                      <p>Atualizar Status de Pagamento para Concluído</p>
-                    </TooltipContent>
-                  </TooltipTrigger>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Button variant="outline" size="sm">
-                      <Trash />
-                    </Button>
-                    <TooltipContent align="center">
-                      <p>Deletar</p>
-                      <TooltipArrow className="TooltipArrow" />
-                    </TooltipContent>
-                  </TooltipTrigger>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          )}
         </div>
+
+        {table.getFilteredSelectedRowModel().rows.length >= 1 && (
+          <div className="left-20 z-50 flex gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button variant="outline" size="sm">
+                    <Check />
+                  </Button>
+                  <TooltipContent align="center">
+                    <p>Atualizar Status de Pagamento para Concluído</p>
+                  </TooltipContent>
+                </TooltipTrigger>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button variant="outline" size="sm">
+                    <Trash />
+                  </Button>
+                  <TooltipContent align="center">
+                    <p>Excluir</p>
+                    <TooltipArrow className="TooltipArrow" />
+                  </TooltipContent>
+                </TooltipTrigger>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        )}
 
         <div className="flex items-center gap-2 rounded-md border border-input bg-background">
           <Button
@@ -454,7 +493,7 @@ export function TransactionsTable({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="min-h-7">{/* } adicionar header { */}</div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
