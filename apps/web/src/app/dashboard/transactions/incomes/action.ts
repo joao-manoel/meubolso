@@ -7,7 +7,6 @@ import { z } from 'zod'
 
 import { createTransaction } from '@/http/create-transaction'
 import { deleteTransactions } from '@/http/delete-transaction'
-import { toCents } from '@/utils/utils'
 
 const deleteTransactionSchema = z.object({
   transactionId: z.string(),
@@ -36,7 +35,18 @@ export async function deleteTransactionAction(data: FormData) {
 }
 const createIncomeActionSchema = z.object({
   title: z.string().min(3, 'Titulo tem que ter no minino 3 caracteres.'),
-  amount: z.string(),
+  amount: z
+    .string()
+    .transform((value) => {
+      // Remove "R$" e qualquer espaço em branco, em seguida, substitui "," por "."
+      const numericValue = parseFloat(
+        value.replace(/[R$\s]/g, '').replace(',', '.'),
+      )
+      return numericValue
+    })
+    .refine((value) => value > 0, {
+      message: 'O valor deve ser positivo.',
+    }),
   categoryId: z.string(),
   payDate: z.string(),
   cardId: z.string(),
@@ -108,7 +118,7 @@ export async function createIncomeAction(data: FormData) {
     const transaction = await createTransaction({
       walletId,
       title,
-      amount: toCents(amount),
+      amount: amount * 100,
       type: 'INCOME',
       payDate,
       ...(recurrence ? { recurrence } : { recurrence: 'VARIABLE' }),
