@@ -310,8 +310,10 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
                     Deletar {transaction.title}
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    Esta ação não poderá ser desfeita. Ela irá excluir
-                    permanentemente sua transação.
+                    {transaction.installmentInfo?.id &&
+                    transaction.recurrence !== 'MONTH'
+                      ? 'Todas parcelas seram deletada. Ela irá excluir permanentemente sua transação.'
+                      : 'Esta ação não poderá ser desfeita. Ela irá excluir permanentemente sua transação.'}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
