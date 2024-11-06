@@ -21,7 +21,7 @@ import { transformTypeWalletText } from '@/utils/format'
 import { deletePersonalWalletAction } from './action'
 
 export default async function WalletList() {
-  const walletSlugCookie = cookies().get('wallet')?.value
+  const walletId = cookies().get('wallet')?.value
   const wallets = await getWallets()
 
   return (
@@ -54,17 +54,17 @@ export default async function WalletList() {
                   </TableCell>
                   <TableCell className="py-2.5">
                     <div className="flex items-center justify-end gap-2">
-                      {walletSlugCookie === wallet.slug && (
+                      {walletId === wallet.id && (
                         <Button variant="ghost" disabled={true}>
                           <span className="h-2 w-2 animate-ping rounded-full bg-green-400" />
                           Ativo
                         </Button>
                       )}
 
-                      {walletSlugCookie !== wallet.slug && (
+                      {walletId !== wallet.id && (
                         <Button size="sm" variant="ghost" asChild>
                           <a
-                            href={`/dashboard/settings/wallets/select/${wallet.slug}`}
+                            href={`/dashboard/settings/wallets/select/${wallet.id}`}
                           >
                             <ExternalLink />
                             Visualizar
@@ -72,9 +72,9 @@ export default async function WalletList() {
                         </Button>
                       )}
 
-                      {walletSlugCookie !== wallet.slug && (
+                      {walletId !== wallet.id && (
                         <AlertDialog>
-                          <AlertDialogTrigger>
+                          <AlertDialogTrigger asChild>
                             <Button size="sm" variant="destructive">
                               <Trash2 />
                               Deletar
@@ -83,16 +83,11 @@ export default async function WalletList() {
                           <AlertDialogContent>
                             <AlertDialogHeader>
                               <AlertDialogTitle>
-                                Tem certeza em deletar carteira{' '}
-                                <span className="text-red-500 underline">
-                                  {wallet.name}
-                                </span>
-                                ?
+                                Deletar carteira {wallet.name}
                               </AlertDialogTitle>
                               <AlertDialogDescription>
-                                Esta ação não pode ser desfeita. Isto irá
-                                deletar permanentemente sua carteira e todas
-                                transações.
+                                Esta ação não poderá ser desfeita. Ela irá
+                                excluir permanentemente sua carteira.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
