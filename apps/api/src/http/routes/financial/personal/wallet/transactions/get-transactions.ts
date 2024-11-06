@@ -4,7 +4,8 @@ import {
   TransactionStatusType,
   TransactionType,
 } from '@prisma/client'
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
+import { toZonedTime } from 'date-fns-tz'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -123,17 +124,46 @@ export async function getTransactions(app: FastifyInstance) {
           },
         })
 
+        console.log(transactions[0].installments)
+
+        const timeZone = 'UTC' // Definindo UTC para consistência
+
         const formattedTransactions = transactions.map((transaction) => ({
           ...transaction,
-          payDate: format(new Date(transaction.payDate), 'yyyy/MM/dd'), // Formatação da data
+          payDate:
+            typeof transaction.payDate === 'string'
+              ? format(
+                  toZonedTime(parseISO(transaction.payDate), timeZone),
+                  'yyyy/MM/dd',
+                )
+              : format(
+                  toZonedTime(transaction.payDate, timeZone),
+                  'yyyy/MM/dd',
+                ),
           installments: transaction.installments?.map((installment) => ({
             ...installment,
             payDate: installment.payDate
-              ? format(new Date(installment.payDate), 'yyyy/MM/dd')
-              : null, // Formatação da data das parcelas
+              ? format(
+                  toZonedTime(
+                    typeof installment.payDate === 'string'
+                      ? parseISO(installment.payDate)
+                      : installment.payDate,
+                    timeZone,
+                  ),
+                  'yyyy/MM/dd',
+                )
+              : null,
             paidAt: installment.paidAt
-              ? format(new Date(installment.paidAt), 'yyyy/MM/dd')
-              : null, // Formatação da data de pagamento
+              ? format(
+                  toZonedTime(
+                    typeof installment.paidAt === 'string'
+                      ? parseISO(installment.paidAt)
+                      : installment.paidAt,
+                    timeZone,
+                  ),
+                  'yyyy/MM/dd',
+                )
+              : null,
           })),
         }))
 

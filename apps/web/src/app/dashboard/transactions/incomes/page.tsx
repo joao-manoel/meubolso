@@ -11,37 +11,31 @@ import { TransactionsTable } from '../transaction-table'
 export default async function IncomesPage() {
   const walletId = cookies().get('wallet')?.value
 
-  if (!walletId) {
+  if (!walletId && walletId !== 'null' && walletId !== 'undefined') {
     redirect('/dashboard')
   }
 
-  const transactions = await getTransactions({
-    type: 'INCOME',
-    walletId,
-  })
+  try {
+    const [transactions, wallet, walletCategorys, transactionsCategorys] =
+      await Promise.all([
+        getTransactions({ type: 'INCOME', walletId }),
+        getWallet(walletId),
+        getWalletTransactionsCategorys({ walletId, type: 'INCOME' }),
+        getTransactionsCategorys({ type: 'INCOME' }),
+      ])
 
-  const wallet = await getWallet(walletId)
+    const categorys = [...walletCategorys, ...transactionsCategorys]
 
-  const walletCategorys = await getWalletTransactionsCategorys({
-    walletId,
-    type: 'INCOME',
-  })
-
-  const transactionsCategorys = await getTransactionsCategorys({
-    type: 'INCOME',
-  })
-
-  const categorys = [...walletCategorys, ...transactionsCategorys]
-
-  console.log(transactions)
-
-  return (
-    <div className="space-y-2">
-      <TransactionsTable
-        data={transactions}
-        wallet={wallet}
-        categorys={categorys}
-      />
-    </div>
-  )
+    return (
+      <div className="space-y-2">
+        <TransactionsTable
+          data={transactions}
+          wallet={wallet}
+          categorys={categorys}
+        />
+      </div>
+    )
+  } catch (error) {
+    redirect('/dashboard')
+  }
 }

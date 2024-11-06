@@ -56,7 +56,6 @@ export async function createTransaction(app: FastifyInstance) {
         const userId = await request.getCurrentUserId()
 
         const { walletId } = request.params
-
         const {
           title,
           amount,
@@ -92,17 +91,21 @@ export async function createTransaction(app: FastifyInstance) {
             throw new BadRequestError('Card not found.')
           }
 
+          // Converter `payDate` para UTC
           const payDateObj = new Date(payDate)
           if (isNaN(payDateObj.getTime())) {
             throw new BadRequestError('Invalid pay date')
           }
+          payDateObj.setUTCHours(0, 4, 0, 0)
+          const payDateUTC = payDateObj.toISOString()
 
+          // Criar a transação
           const transaction = await prisma.transaction.create({
             data: {
               title,
               amount,
               status,
-              payDate: payDateObj,
+              payDate: payDateUTC,
               categoryId,
               recurrence,
               type,
@@ -110,12 +113,20 @@ export async function createTransaction(app: FastifyInstance) {
               walletId: wallet.id,
               ...(installments && {
                 installments: {
-                  create: installments.map((installment) => ({
-                    status: installment.status,
-                    installment: installment.installment,
-                    payDate: new Date(installment.payDate),
-                    paidAt: installment.paidAt,
-                  })),
+                  create: installments.map((installment) => {
+                    const installmentPayDate = new Date(installment.payDate)
+                    installmentPayDate.setUTCHours(0, 4, 0, 0)
+                    const installmentPaidAt = installment.paidAt
+                      ? new Date(installment.paidAt).toISOString()
+                      : undefined
+
+                    return {
+                      status: installment.status,
+                      installment: installment.installment,
+                      payDate: installmentPayDate,
+                      paidAt: installmentPaidAt,
+                    }
+                  }),
                 },
               }),
             },

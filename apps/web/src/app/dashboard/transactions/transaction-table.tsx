@@ -78,6 +78,7 @@ const filterTransactions = (
 ): TransactionWithInstallmentInfo[] => {
   return transactions.flatMap((transaction) => {
     const transactionDate = new Date(transaction.payDate)
+    transactionDate.setHours(12)
     const isSameMonth = transactionDate.getMonth() === currentDate.getMonth()
     const isSameYear =
       transactionDate.getFullYear() === currentDate.getFullYear()
@@ -88,11 +89,15 @@ const filterTransactions = (
 
     // Verificar se há um installment recorrente pago para o mês atual
     const recurringInstallment = transaction.installments.find(
-      (installment) =>
-        installment.isRecurring &&
-        new Date(installment.payDate).getMonth() === currentDate.getMonth() &&
-        new Date(installment.payDate).getFullYear() ===
-          currentDate.getFullYear(),
+      (installment) => {
+        const installmentDate = new Date(installment.payDate)
+        installmentDate.setHours(12)
+        return (
+          installment.isRecurring &&
+          installmentDate.getMonth() === currentDate.getMonth() &&
+          installmentDate.getFullYear() === currentDate.getFullYear()
+        )
+      },
     )
 
     if (recurringInstallment) {
