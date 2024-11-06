@@ -1,4 +1,5 @@
 'use client'
+import { TooltipArrow } from '@radix-ui/react-tooltip'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -17,8 +18,10 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpDown,
+  Check,
   ChevronDown,
   MoreHorizontal,
+  Trash,
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
@@ -49,6 +52,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 import { GetTransactionsResponse } from '@/http/get-transactions'
 import { GetTransactionsCategorysResponse } from '@/http/get-transactions-categorys'
 import { GetWalletResponse } from '@/http/get-wallet'
@@ -270,11 +279,17 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+            <DropdownMenuLabel>Atualiza Pagamento</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(transaction.id)}
             >
-              Copiar ID
+              Concluido
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => navigator.clipboard.writeText(transaction.id)}
+            >
+              Pendente
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
@@ -355,6 +370,34 @@ export function TransactionsTable({
               <CreateIncomeForm wallet={wallet} categorys={categorys} />
             </DialogContent>
           </Dialog>
+          {table.getFilteredSelectedRowModel().rows.length >= 1 && (
+            <div className="flex gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button variant="outline" size="sm">
+                      <Check />
+                    </Button>
+                    <TooltipContent align="center">
+                      <p>Atualizar Status de Pagamento para Concluído</p>
+                    </TooltipContent>
+                  </TooltipTrigger>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button variant="outline" size="sm">
+                      <Trash />
+                    </Button>
+                    <TooltipContent align="center">
+                      <p>Deletar</p>
+                      <TooltipArrow className="TooltipArrow" />
+                    </TooltipContent>
+                  </TooltipTrigger>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2 rounded-md border border-input bg-background">
@@ -411,6 +454,7 @@ export function TransactionsTable({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      <div className="min-h-7">{/* } adicionar header { */}</div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -463,8 +507,12 @@ export function TransactionsTable({
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          <div className="flex items-center gap-2">
+            <div>
+              {table.getFilteredSelectedRowModel().rows.length} of{' '}
+              {table.getFilteredRowModel().rows.length} item(s) selecionado.
+            </div>
+          </div>
         </div>
         <div className="space-x-2">
           <Button
