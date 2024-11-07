@@ -62,7 +62,6 @@ import { GetTransactionsResponse } from '@/http/get-transactions'
 import { GetTransactionsCategorysResponse } from '@/http/get-transactions-categorys'
 import { GetWalletResponse } from '@/http/get-wallet'
 
-import CreateIncomeForm from '../app/dashboard/transactions/incomes/create-income-form'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -73,7 +72,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from './ui/alert-dialog'
+} from '../../../components/ui/alert-dialog'
+import { deleteTransactionAction } from './incomes/action'
+import CreateIncomeForm from './incomes/create-income-form'
 
 interface TransactionTableProps {
   data: GetTransactionsResponse[]
@@ -273,10 +274,15 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
     id: 'actions',
     cell: ({ row }) => {
       const transaction = row.original
+      const [isDropdownOpen, setIsDropdownOpen] = useState(false)
       return (
-        <DropdownMenu>
+        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
+            <Button
+              variant="ghost"
+              className="h-8 w-8 p-0"
+              onClick={() => setIsDropdownOpen((prev) => !prev)}
+            >
               <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4" />
             </Button>
@@ -300,7 +306,11 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault()
+                  }}
+                >
                   Excluir
                 </DropdownMenuItem>
               </AlertDialogTrigger>
@@ -317,16 +327,31 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel
+                    type="button"
+                    onClick={() => {
+                      setIsDropdownOpen(false)
+                    }}
+                  >
+                    Cancelar
+                  </AlertDialogCancel>
                   <AlertDialogAction
                     asChild
                     className="bg-transparent p-0 hover:bg-transparent"
                   >
-                    <form>
+                    <form
+                      action={deleteTransactionAction.bind(null, {
+                        walletId: transaction.wallet.id,
+                        transactions: [transaction.id],
+                      })}
+                    >
                       <Button
                         variant="destructive"
                         type="submit"
                         className="w-full"
+                        onClick={() => {
+                          setIsDropdownOpen(false)
+                        }}
                       >
                         Excluir
                       </Button>
@@ -384,7 +409,6 @@ export function TransactionsTable({
       rowSelection,
     },
   })
-
   return (
     <div className="relative w-full p-2">
       <h1 className="text-2xl font-bold">Receitas</h1>
@@ -426,17 +450,56 @@ export function TransactionsTable({
                 </TooltipTrigger>
               </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger>
-                  <Button variant="outline" size="sm">
-                    <Trash />
-                  </Button>
-                  <TooltipContent align="center">
-                    <p>Excluir</p>
-                    <TooltipArrow className="TooltipArrow" />
-                  </TooltipContent>
-                </TooltipTrigger>
-              </Tooltip>
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Button variant="outline" size="sm">
+                        <Trash />
+                      </Button>
+                      <TooltipContent align="center">
+                        <p>Excluir</p>
+                        <TooltipArrow className="TooltipArrow" />
+                      </TooltipContent>
+                    </TooltipTrigger>
+                  </Tooltip>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Deseja excluir todas as receitas selecionadas?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esta ação é irreversível e excluirá permanentemente todas
+                      as transações selecionadas.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel type="button">Cancela</AlertDialogCancel>
+                    <AlertDialogAction
+                      asChild
+                      className="bg-transparent p-0 hover:bg-transparent"
+                    >
+                      <form
+                        action={deleteTransactionAction.bind(null, {
+                          walletId: wallet.id,
+                          transactions: table
+                            .getFilteredSelectedRowModel()
+                            .rows.map((row) => row.original.id),
+                        })}
+                      >
+                        <Button
+                          variant="destructive"
+                          type="submit"
+                          className="w-full"
+                        >
+                          Confirma
+                        </Button>
+                      </form>
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </TooltipProvider>
           </div>
         )}
