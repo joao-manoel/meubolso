@@ -8,7 +8,10 @@ export function middleware(request: NextRequest) {
   if (pathname.startsWith('/dashboard/settings/wallets/select')) {
     const [, , , , , walletId] = pathname.split('/')
 
-    response.cookies.set('wallet', walletId)
+    response.cookies.set('wallet', walletId, {
+      maxAge: 60 * 60 * 24 * 365, // 30 days
+      path: '/',
+    })
   }
 
   return response

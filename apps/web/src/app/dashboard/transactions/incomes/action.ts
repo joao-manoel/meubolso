@@ -23,6 +23,7 @@ const createIncomeActionSchema = z.object({
       message: 'O valor deve ser positivo.',
     }),
   categoryId: z.string(),
+  type: z.enum(['INCOME', 'EXPENSE']),
   payDate: z.string(),
   cardId: z.string(),
   recurrence: z.enum(['VARIABLE', 'MONTH', 'YEAR']).optional(),
@@ -76,6 +77,7 @@ export async function createIncomeAction(data: FormData) {
     cardId,
     recurrence,
     installments,
+    type,
   } = result.data
 
   const walletId = cookies().get('wallet')?.value
@@ -94,7 +96,7 @@ export async function createIncomeAction(data: FormData) {
       walletId,
       title,
       amount: amount * 100,
-      type: 'INCOME',
+      type,
       payDate,
       ...(recurrence ? { recurrence } : { recurrence: 'VARIABLE' }),
       categoryId,

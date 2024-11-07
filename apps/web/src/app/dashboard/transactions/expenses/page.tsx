@@ -8,7 +8,7 @@ import { getWalletTransactionsCategorys } from '@/http/get-wallet-transactions-c
 
 import { TransactionsTable } from '../transaction-table'
 
-export default async function IncomesPage() {
+export default async function ExpensesPage() {
   const walletId = cookies().get('wallet')?.value
 
   if (!walletId) {
@@ -19,12 +19,12 @@ export default async function IncomesPage() {
     const [transactions, wallet, walletCategorys, transactionsCategorys] =
       await Promise.all([
         getTransactions({
-          type: 'INCOME',
+          type: 'EXPENSE',
           walletId,
         }),
         getWallet(walletId),
-        getWalletTransactionsCategorys({ walletId, type: 'INCOME' }),
-        getTransactionsCategorys({ type: 'INCOME' }),
+        getWalletTransactionsCategorys({ walletId, type: 'EXPENSE' }),
+        getTransactionsCategorys({ type: 'EXPENSE' }),
       ])
 
     const categorys = [...walletCategorys, ...transactionsCategorys]
@@ -34,7 +34,7 @@ export default async function IncomesPage() {
           data={transactions}
           wallet={wallet}
           categorys={categorys}
-          type="INCOME"
+          type="EXPENSE"
         />
       </div>
     )

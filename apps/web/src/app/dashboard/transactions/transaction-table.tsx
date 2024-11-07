@@ -80,6 +80,7 @@ interface TransactionTableProps {
   data: GetTransactionsResponse[]
   wallet: GetWalletResponse
   categorys: GetTransactionsCategorysResponse[]
+  type: 'INCOME' | 'EXPENSE'
 }
 
 type TransactionWithInstallmentInfo = GetTransactionsResponse & {
@@ -371,6 +372,7 @@ export function TransactionsTable({
   data,
   wallet,
   categorys,
+  type,
 }: TransactionTableProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [sorting, setSorting] = useState<SortingState>([])
@@ -391,6 +393,10 @@ export function TransactionsTable({
     setCurrentDate((prevDate) => addMonths(prevDate, 1))
   }
 
+  const clearSelection = () => {
+    setRowSelection({})
+  }
+
   const table = useReactTable({
     data: filteredTransactions,
     columns,
@@ -409,9 +415,24 @@ export function TransactionsTable({
       rowSelection,
     },
   })
+
+  const handleConfirmDelete = () => {
+    deleteTransactionAction({
+      walletId: wallet.id,
+      transactions: table
+        .getFilteredSelectedRowModel()
+        .rows.map((row) => row.original.id),
+    })
+
+    setTimeout(() => {
+      clearSelection()
+    }, 100)
+  }
   return (
     <div className="relative w-full p-2">
-      <h1 className="text-2xl font-bold">Receitas</h1>
+      <h1 className="text-2xl font-bold">
+        {type === 'INCOME' ? 'Receitas' : 'Despesas'}
+      </h1>
       <div className="flex items-center gap-2 py-4">
         <div className="flex w-full gap-2">
           <Input
@@ -429,9 +450,15 @@ export function TransactionsTable({
 
             <DialogContent>
               <DialogTitle>
-                <h1 className="text-2xl font-bold">Receita</h1>
+                <h1 className="text-2xl font-bold">
+                  {type === 'INCOME' ? 'Receita' : 'Despesa'}
+                </h1>
               </DialogTitle>
-              <CreateIncomeForm wallet={wallet} categorys={categorys} />
+              <CreateIncomeForm
+                wallet={wallet}
+                categorys={categorys}
+                type="EXPENSE"
+              />
             </DialogContent>
           </Dialog>
         </div>
@@ -480,14 +507,7 @@ export function TransactionsTable({
                       asChild
                       className="bg-transparent p-0 hover:bg-transparent"
                     >
-                      <form
-                        action={deleteTransactionAction.bind(null, {
-                          walletId: wallet.id,
-                          transactions: table
-                            .getFilteredSelectedRowModel()
-                            .rows.map((row) => row.original.id),
-                        })}
-                      >
+                      <form action={handleConfirmDelete}>
                         <Button
                           variant="destructive"
                           type="submit"

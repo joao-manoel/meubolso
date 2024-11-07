@@ -34,11 +34,13 @@ import { createIncomeAction } from './action'
 export interface CreateIncomeFormProps {
   wallet: GetWalletResponse
   categorys: GetTransactionsCategorysResponse[]
+  type: 'EXPENSE' | 'INCOME'
 }
 
 export default function CreateIncomeForm({
   wallet,
   categorys,
+  type,
 }: CreateIncomeFormProps) {
   const [title, setTitle] = useState('')
   const [amount, setAmount] = useState('')
@@ -143,6 +145,7 @@ export default function CreateIncomeForm({
         <div className="grid grid-cols-[70%_minmax(30%,_1fr)] gap-3">
           <div className="gap-2 space-y-2">
             <Label htmlFor="title">Titulo</Label>
+            <input value={type} name="type" hidden />
             <Input
               placeholder="Digite um titulo"
               onChange={(e) => setTitle(e.target.value)}
