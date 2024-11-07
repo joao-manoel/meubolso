@@ -6,33 +6,8 @@ import { cookies } from 'next/headers'
 import { z } from 'zod'
 
 import { createTransaction } from '@/http/create-transaction'
-import { deleteTransactions } from '@/http/delete-transaction'
+import { deleteTransactions } from '@/http/delete-transactions'
 
-const deleteTransactionSchema = z.object({
-  transactionId: z.string(),
-  walletId: z.string(),
-})
-
-export async function deleteTransactionAction(data: FormData) {
-  const result = deleteTransactionSchema.safeParse(Object.fromEntries(data))
-
-  if (!result.success) {
-    const errors = result.error.flatten().fieldErrors
-
-    return { success: false, message: null, errors }
-  }
-
-  const { walletId, transactionId } = result.data
-
-  await deleteTransactions({
-    walletId,
-    transactionId,
-  })
-
-  revalidateTag(`${walletId}/transactions`)
-
-  return { success: true, message: null, errors: null }
-}
 const createIncomeActionSchema = z.object({
   title: z.string().min(3, 'Titulo tem que ter no minino 3 caracteres.'),
   amount: z
@@ -160,4 +135,21 @@ export async function createIncomeAction(data: FormData) {
 
     return { success: false, message: null, errors: null }
   }
+}
+
+interface DeleteTransactionActionProps {
+  walletId: string
+  transactions: Array<string>
+}
+
+export async function deleteTransactionAction({
+  walletId,
+  transactions,
+}: DeleteTransactionActionProps) {
+  await deleteTransactions({
+    walletId,
+    transactions,
+  })
+
+  revalidateTag(`${walletId}/transactions`)
 }

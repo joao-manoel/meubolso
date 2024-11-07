@@ -2,12 +2,16 @@ import { api } from './api-client'
 
 interface DeleteTransactionRequest {
   walletId: string
-  transactionId: string
+  transactions: Array<string>
 }
 
 export async function deleteTransactions({
   walletId,
-  transactionId,
+  transactions,
 }: DeleteTransactionRequest) {
-  await api.delete(`wallet/${walletId}/transaction/${transactionId}`)
+  await api.delete(`wallet/${walletId}/transactions`, {
+    json: {
+      transactions,
+    },
+  })
 }

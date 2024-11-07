@@ -11,15 +11,17 @@ export async function deleteTransaction(app: FastifyInstance) {
     .withTypeProvider<ZodTypeProvider>()
     .register(auth)
     .delete(
-      '/wallet/:walletId/transaction/:transactionId',
+      '/wallet/:walletId/transactions',
       {
         schema: {
           tags: ['Transactions'],
           summary: 'Delete transactions',
           security: [{ bearerAuth: [] }],
           params: z.object({
-            transactionId: z.string().uuid(),
             walletId: z.string().uuid(),
+          }),
+          body: z.object({
+            transactions: z.array(z.string().uuid()),
           }),
           response: {
             204: z.null(),
@@ -29,7 +31,8 @@ export async function deleteTransaction(app: FastifyInstance) {
       async (request, reply) => {
         const userId = await request.getCurrentUserId()
 
-        const { walletId, transactionId } = request.params
+        const { walletId } = request.params
+        const { transactions } = request.body
 
         const wallet = await prisma.wallet.findUnique({
           where: {
@@ -43,23 +46,10 @@ export async function deleteTransaction(app: FastifyInstance) {
           throw new BadRequestError('Wallet not found.')
         }
 
-        const transaction = await prisma.transaction.findUnique({
+        await prisma.transaction.deleteMany({
           where: {
-            id: transactionId,
-            wallet: {
-              id: walletId,
-              ownerId: userId,
-            },
-          },
-        })
-
-        if (!transaction) {
-          throw new BadRequestError('Transaction not found.')
-        }
-
-        await prisma.transaction.delete({
-          where: {
-            id: transaction.id,
+            id: { in: transactions },
+            walletId,
           },
         })
 
