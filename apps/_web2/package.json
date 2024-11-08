@@ -1,9 +1,9 @@
 {
-  "name": "@mb/web2",
+  "name": "@disabled/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm env:load next dev --turbo",
+   "dev": "pnpm env:load next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

@@ -15,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-Br" suppressHydrationWarning>
-      <body>
+    <html lang="pt-Br" suppressHydrationWarning={true}>
+      <body cz-shortcut-listen="true">
         <Providers>{children}</Providers>
       </body>
     </html>
