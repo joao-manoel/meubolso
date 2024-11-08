@@ -31,6 +31,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
@@ -73,8 +74,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '../../../components/ui/alert-dialog'
-import { deleteTransactionAction } from './incomes/action'
-import CreateIncomeForm from './incomes/create-income-form'
+import {
+  deleteTransactionAction,
+  updatePaymentTransactionsAction,
+} from './action'
+import CreateIncomeForm from './create-income-form'
 
 interface TransactionTableProps {
   data: GetTransactionsResponse[]
@@ -276,6 +280,48 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
     cell: ({ row }) => {
       const transaction = row.original
       const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+
+      const UpdatePayment = ({ status }: { status: 'paid' | 'pending' }) => {
+        const selectedTransaction = [
+          {
+            id: transaction.id,
+            recurrence: transaction.recurrence,
+            payDate: transaction.payDate,
+            status,
+            installments:
+              transaction.installmentInfo &&
+              transaction.recurrence === 'VARIABLE'
+                ? [
+                    {
+                      id: transaction.installmentInfo.id,
+                    },
+                  ]
+                : undefined, // Quando não há parcelas, não incluir o campo installments
+          },
+        ]
+
+        updatePaymentTransactionsAction({
+          walletId: transaction.wallet.id,
+          transactions: selectedTransaction,
+        })
+      }
+
+      const OptionRevokePayment = () => {
+        if (
+          (transaction.installmentInfo &&
+            transaction.installmentInfo.status === 'paid') ||
+          (transaction.status === 'paid' && !transaction.installmentInfo)
+        ) {
+          return (
+            <DropdownMenuItem
+              onClick={() => UpdatePayment({ status: 'pending' })}
+            >
+              Cancelar pagamento
+            </DropdownMenuItem>
+          )
+        }
+      }
+
       return (
         <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
           <DropdownMenuTrigger asChild>
@@ -289,18 +335,13 @@ const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Atualiza Pagamento</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(transaction.id)}
-            >
-              Concluido
+            <DropdownMenuLabel>Pagamento</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => UpdatePayment({ status: 'paid' })}>
+              Efetuar pagamento
             </DropdownMenuItem>
 
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(transaction.id)}
-            >
-              Pendente
-            </DropdownMenuItem>
+            {OptionRevokePayment()}
+
             <DropdownMenuSeparator />
             <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
             <DropdownMenuItem>Editar</DropdownMenuItem>
@@ -428,6 +469,39 @@ export function TransactionsTable({
       clearSelection()
     }, 100)
   }
+
+  const handleUpdatePayment = () => {
+    // Mapeia as transações selecionadas para o formato esperado pela action
+
+    const selectedTransactions = table
+      .getFilteredSelectedRowModel()
+      .rows.map((row) => {
+        const transaction = row.original
+
+        return {
+          id: transaction.id,
+          recurrence: transaction.recurrence,
+          payDate: transaction.payDate,
+          month: currentDate.getMonth().toString(),
+          installments:
+            transaction.installmentInfo && transaction.recurrence === 'VARIABLE'
+              ? [
+                  {
+                    id: transaction.installmentInfo.id,
+                  },
+                ]
+              : undefined, // Quando não há parcelas, não incluir o campo installments
+        }
+      })
+
+    updatePaymentTransactionsAction({
+      walletId: wallet.id,
+      transactions: selectedTransactions,
+    })
+
+    clearSelection()
+  }
+
   return (
     <div className="relative w-full p-2">
       <h1 className="text-2xl font-bold">
@@ -448,16 +522,19 @@ export function TransactionsTable({
               <Button variant="outline">Adicionar Receita</Button>
             </DialogTrigger>
 
-            <DialogContent>
+            <DialogContent aria-describedby="formulario de adicionar transação">
               <DialogTitle>
-                <h1 className="text-2xl font-bold">
+                <p className="text-2xl font-bold">
                   {type === 'INCOME' ? 'Receita' : 'Despesa'}
-                </h1>
+                </p>
+                <DialogDescription>
+                  Adicionar uma nova transação.
+                </DialogDescription>
               </DialogTitle>
               <CreateIncomeForm
                 wallet={wallet}
                 categorys={categorys}
-                type="EXPENSE"
+                type={type}
               />
             </DialogContent>
           </Dialog>
@@ -468,7 +545,11 @@ export function TransactionsTable({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <Button variant="outline" size="sm">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleUpdatePayment}
+                  >
                     <Check />
                   </Button>
                   <TooltipContent align="center">
