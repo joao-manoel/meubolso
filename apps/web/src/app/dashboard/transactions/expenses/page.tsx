@@ -1,12 +1,11 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
+import { TransactionsTable } from '@/components/transaction-table'
 import { getTransactions } from '@/http/get-transactions'
 import { getTransactionsCategorys } from '@/http/get-transactions-categorys'
 import { getWallet } from '@/http/get-wallet'
 import { getWalletTransactionsCategorys } from '@/http/get-wallet-transactions-categorys'
-
-import { TransactionsTable } from '../transaction-table'
 
 export default async function ExpensesPage() {
   const walletId = cookies().get('wallet')?.value

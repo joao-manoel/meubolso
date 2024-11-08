@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/card'
 import { getWallets } from '@/http/get-wallets'
 
-import CreatePersonalWalletForm from './settings/wallets/create-personal-wallet-form'
+import CreatePersonalWalletForm from '../settings/wallets/create-personal-wallet-form'
 
 export default async function DashboardPage() {
   const { user } = await auth()

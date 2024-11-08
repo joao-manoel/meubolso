@@ -1,7 +1,6 @@
 'use client'
 import { TooltipArrow } from '@radix-ui/react-tooltip'
 import {
-  ColumnDef,
   ColumnFiltersState,
   flexRender,
   getCoreRowModel,
@@ -14,20 +13,10 @@ import {
 } from '@tanstack/react-table'
 import { addMonths, format, subMonths } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import {
-  ArrowLeft,
-  ArrowRight,
-  ArrowUpDown,
-  Check,
-  ChevronDown,
-  MoreHorizontal,
-  Trash,
-} from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Trash } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-import { CardIcon } from '@/components/CardIcon'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
@@ -39,9 +28,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
@@ -59,10 +45,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { GetTransactionsResponse } from '@/http/get-transactions'
-import { GetTransactionsCategorysResponse } from '@/http/get-transactions-categorys'
-import { GetWalletResponse } from '@/http/get-wallet'
+import { filterTransactions } from '@/utils/utils'
 
+import {
+  deleteTransactionAction,
+  updatePaymentTransactionsAction,
+} from '../../app/dashboard/transactions/action'
+import CreateIncomeForm from '../../app/dashboard/transactions/create-income-form'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -73,341 +62,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '../../../components/ui/alert-dialog'
-import {
-  deleteTransactionAction,
-  updatePaymentTransactionsAction,
-} from './action'
-import CreateIncomeForm from './create-income-form'
-
-interface TransactionTableProps {
-  data: GetTransactionsResponse[]
-  wallet: GetWalletResponse
-  categorys: GetTransactionsCategorysResponse[]
-  type: 'INCOME' | 'EXPENSE'
-}
-
-type TransactionWithInstallmentInfo = GetTransactionsResponse & {
-  installmentInfo?: {
-    id: string
-    installment: number
-    status: 'paid' | 'pending'
-    isRecurring: boolean
-    payDate: string
-    paidAt?: string
-  }
-}
-
-const filterTransactions = (
-  transactions: GetTransactionsResponse[],
-  currentDate: Date,
-): TransactionWithInstallmentInfo[] => {
-  return transactions.flatMap((transaction) => {
-    const transactionDate = new Date(transaction.payDate)
-    const isSameMonth = transactionDate.getMonth() === currentDate.getMonth()
-    const isSameYear =
-      transactionDate.getFullYear() === currentDate.getFullYear()
-    const isAfterOrSameAsPayDate =
-      currentDate.getFullYear() > transactionDate.getFullYear() ||
-      (currentDate.getFullYear() === transactionDate.getFullYear() &&
-        currentDate.getMonth() >= transactionDate.getMonth())
-
-    const recurringInstallment = transaction.installments.find(
-      (installment) => {
-        const installmentDate = new Date(installment.payDate)
-        return (
-          installment.isRecurring &&
-          installmentDate.getMonth() === currentDate.getMonth() &&
-          installmentDate.getFullYear() === currentDate.getFullYear()
-        )
-      },
-    )
-
-    if (recurringInstallment) {
-      return [
-        {
-          ...transaction,
-          amount: transaction.amount,
-          installmentInfo: recurringInstallment,
-        },
-      ]
-    }
-
-    if (
-      transaction.recurrence === 'VARIABLE' &&
-      transaction.installments.length > 0
-    ) {
-      return transaction.installments
-        .filter((installment) => {
-          const installmentDate = new Date(installment.payDate)
-          return (
-            installmentDate.getMonth() === currentDate.getMonth() &&
-            installmentDate.getFullYear() === currentDate.getFullYear()
-          )
-        })
-        .map((installment) => ({
-          ...transaction,
-          amount: transaction.amount / transaction.installments.length,
-          installmentInfo: installment,
-        }))
-    }
-
-    switch (transaction.recurrence) {
-      case 'VARIABLE':
-        return isSameMonth && isSameYear ? [transaction] : []
-
-      case 'MONTH':
-        return isAfterOrSameAsPayDate ? [transaction] : []
-
-      case 'YEAR':
-        return isSameMonth && isAfterOrSameAsPayDate ? [transaction] : []
-
-      default:
-        return []
-    }
-  }) as TransactionWithInstallmentInfo[]
-}
-
-const columns: ColumnDef<TransactionWithInstallmentInfo>[] = [
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: 'title',
-    header: 'Título',
-    cell: ({ row }) => (
-      <div className="capitalize">
-        {row.original.installmentInfo
-          ? `${row.getValue('title')} ${row.original.recurrence === 'VARIABLE' ? `(Parcela ${row.original.installmentInfo.installment})` : ''}`
-          : row.getValue('title')}
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'amount',
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        >
-          Valor
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('amount')) / 100
-
-      const formatted = new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }).format(amount)
-      return <div className="font-medium">{formatted}</div>
-    },
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status de Pagamento',
-    cell: ({ row }) => {
-      const status =
-        row.original.installmentInfo?.status || row.getValue('status')
-      return (
-        <div className="flex items-center gap-2">
-          <span
-            className={`h-2 w-2 rounded-full ${status === 'pending' ? 'bg-orange-400' : 'bg-green-400'}`}
-          />
-          <span className="capitalize">
-            {status === 'pending' ? 'Aguardando' : 'Pago'}
-          </span>
-        </div>
-      )
-    },
-  },
-  {
-    accessorKey: 'installments',
-    header: 'Parcelas',
-    cell: ({ row }) => {
-      const installmentInfo = row.original.installmentInfo
-      if (installmentInfo && installmentInfo.isRecurring === false) {
-        return `${installmentInfo.installment}/${row.original.installments.length}`
-      }
-      return '1x'
-    },
-  },
-  {
-    accessorKey: 'payDate',
-    header: 'Vencimento',
-    cell: ({ row }) => {
-      const date =
-        row.original.installmentInfo?.payDate || row.getValue('payDate')
-      return format(new Date(date || ''), 'dd/MM/yyyy')
-    },
-  },
-  {
-    accessorKey: 'card',
-    header: 'Cartão',
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <span className="flex items-center gap-2 capitalize">
-          {CardIcon(row.original.card.icon)}
-          {row.original.card.name}
-        </span>
-      </div>
-    ),
-  },
-  {
-    id: 'actions',
-    cell: ({ row }) => {
-      const transaction = row.original
-      const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-
-      const UpdatePayment = ({ status }: { status: 'paid' | 'pending' }) => {
-        const selectedTransaction = [
-          {
-            id: transaction.id,
-            recurrence: transaction.recurrence,
-            payDate: transaction.payDate,
-            status,
-            installments:
-              transaction.installmentInfo &&
-              transaction.recurrence === 'VARIABLE'
-                ? [
-                    {
-                      id: transaction.installmentInfo.id,
-                    },
-                  ]
-                : undefined, // Quando não há parcelas, não incluir o campo installments
-          },
-        ]
-
-        updatePaymentTransactionsAction({
-          walletId: transaction.wallet.id,
-          transactions: selectedTransaction,
-        })
-      }
-
-      const OptionRevokePayment = () => {
-        if (
-          (transaction.installmentInfo &&
-            transaction.installmentInfo.status === 'paid') ||
-          (transaction.status === 'paid' && !transaction.installmentInfo)
-        ) {
-          return (
-            <DropdownMenuItem
-              onClick={() => UpdatePayment({ status: 'pending' })}
-            >
-              Cancelar pagamento
-            </DropdownMenuItem>
-          )
-        }
-      }
-
-      return (
-        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0"
-              onClick={() => setIsDropdownOpen((prev) => !prev)}
-            >
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Pagamento</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => UpdatePayment({ status: 'paid' })}>
-              Efetuar pagamento
-            </DropdownMenuItem>
-
-            {OptionRevokePayment()}
-
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
-            <DropdownMenuItem>Editar</DropdownMenuItem>
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault()
-                  }}
-                >
-                  Excluir
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Deletar {transaction.title}
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {transaction.installmentInfo?.id &&
-                    transaction.recurrence !== 'MONTH'
-                      ? 'Todas parcelas seram deletada. Ela irá excluir permanentemente sua transação.'
-                      : 'Esta ação não poderá ser desfeita. Ela irá excluir permanentemente sua transação.'}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel
-                    type="button"
-                    onClick={() => {
-                      setIsDropdownOpen(false)
-                    }}
-                  >
-                    Cancelar
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    asChild
-                    className="bg-transparent p-0 hover:bg-transparent"
-                  >
-                    <form
-                      action={deleteTransactionAction.bind(null, {
-                        walletId: transaction.wallet.id,
-                        transactions: [transaction.id],
-                      })}
-                    >
-                      <Button
-                        variant="destructive"
-                        type="submit"
-                        className="w-full"
-                        onClick={() => {
-                          setIsDropdownOpen(false)
-                        }}
-                      >
-                        Excluir
-                      </Button>
-                    </form>
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
-  },
-]
+} from '../ui/alert-dialog'
+import { columns } from './columns'
+import { TransactionTableProps } from './types'
 
 export function TransactionsTable({
   data,
