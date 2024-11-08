@@ -5,5 +5,5 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   clean: true,
-  noExternal: ['@cro/auth', '@cro/env'],
+  noExternal: ['@mb/auth', '@mb/env'],
 })

@@ -1,5 +1,5 @@
 {
-  "name": "@cro/web2",
+  "name": "@mb/web2",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,8 +10,8 @@
     "env:load": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@cro/auth": "workspace:*",
-    "@cro/env": "workspace:*",
+    "@mb/auth": "workspace:*",
+    "@mb/env": "workspace:*",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-checkbox": "^1.1.2",
@@ -47,9 +47,9 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@cro/eslint-config": "workspace:*",
-    "@cro/prettier": "workspace:*",
-    "@cro/tsconfig": "workspace:*",
+    "@mb/eslint-config": "workspace:*",
+    "@mb/prettier": "workspace:*",
+    "@mb/tsconfig": "workspace:*",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -58,10 +58,10 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   },
-  "prettier": "@cro/prettier",
+  "prettier": "@mb/prettier",
   "eslintConfig": {
     "extends": [
-      "@cro/eslint-config/next"
+      "@mb/eslint-config/next"
     ]
   }
 }

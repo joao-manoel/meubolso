@@ -1,13 +1,13 @@
 {
-  "name": "@cro/api",
+  "name": "@mb/api",
   "version": "1.0.0",
   "scripts": {
     "dev": "pnpm env:load tsx watch src/http/server.ts",
     "env:load": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@cro/auth": "workspace:*",
-    "@cro/env": "workspace:*",
+    "@mb/auth": "workspace:*",
+    "@mb/env": "workspace:*",
     "@fastify/cors": "^9.0.1",
     "@fastify/jwt": "^8.0.1",
     "@prisma/client": "5.16.2",
@@ -29,9 +29,9 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@cro/eslint-config": "workspace:*",
-    "@cro/prettier": "workspace:*",
-    "@cro/tsconfig": "workspace:*",
+    "@mb/eslint-config": "workspace:*",
+    "@mb/prettier": "workspace:*",
+    "@mb/tsconfig": "workspace:*",
     "@types/node": "^20.14.9",
     "@types/nodemailer": "^6.4.15",
     "dotenv-cli": "^7.4.2",
@@ -41,10 +41,10 @@
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
-  "prettier": "@cro/prettier",
+  "prettier": "@mb/prettier",
   "eslintConfig": {
     "extends": [
-      "@cro/eslint-config/node"
+      "@mb/eslint-config/node"
     ]
   }
 }

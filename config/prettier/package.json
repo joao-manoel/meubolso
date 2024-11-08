@@ -1,5 +1,5 @@
 {
-  "name": "@cro/prettier",
+  "name": "@mb/prettier",
   "version": "0.0.0",
   "main": "index.mjs",
   "private": true,

@@ -1,4 +1,4 @@
 {
-  "extends": "@cro/tsconfig/library.json",
+  "extends": "@mb/tsconfig/library.json",
   "include": ["index.ts"]
 }

@@ -1,20 +1,20 @@
 {
-  "name": "@cro/auth",
+  "name": "@mb/auth",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.ts",
   "types": "src/index.ts",
   "devDependencies": {
-    "@cro/eslint-config": "workspace:*",
-    "@cro/prettier": "workspace:*",
-    "@cro/tsconfig": "workspace:*"
+    "@mb/eslint-config": "workspace:*",
+    "@mb/prettier": "workspace:*",
+    "@mb/tsconfig": "workspace:*"
   },
   "eslintConfig": {
     "extends": [
-      "@cro/eslint-config/library"
+      "@mb/eslint-config/library"
     ]
   },
-  "prettier": "@cro/prettier",
+  "prettier": "@mb/prettier",
   "dependencies": {
     "@casl/ability": "^6.7.1",
     "zod": "^3.23.8"

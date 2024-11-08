@@ -1,6 +1,6 @@
-import { env } from '@cro/env'
 import fastifyCors from '@fastify/cors'
 import { fastifyJwt } from '@fastify/jwt'
+import { env } from '@mb/env'
 import { fastify } from 'fastify'
 import {
   serializerCompiler,

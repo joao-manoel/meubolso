@@ -1,5 +1,5 @@
 {
-  "name": "@cro/eslint-config",
+  "name": "@mb/eslint-config",
   "version": "0.0.0",
   "private": true,
   "files": [
@@ -9,10 +9,10 @@
   ],
   "devDependencies": {
     "@rocketseat/eslint-config": "^2.2.2",
-    "@cro/prettier": "workspace:*",
+    "@mb/prettier": "workspace:*",
     "eslint-plugin-simple-import-sort": "^12.1.1"
   },
-  "prettier": "@cro/prettier",
+  "prettier": "@mb/prettier",
   "eslintConfig": {
     "extends": ["./library.js"]
   }

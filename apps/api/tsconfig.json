@@ -1,5 +1,5 @@
 {
-  "extends": "@cro/tsconfig/node.json",
+  "extends": "@mb/tsconfig/node.json",
   "include": ["src/**/*", "@types/*.d.ts"],
   "compilerOptions": {
     "baseUrl": ".",
