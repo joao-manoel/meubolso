@@ -1,7 +1,19 @@
+import { cookies } from 'next/headers'
 import { ReactNode } from 'react'
+
+import CreateIncomeForm from '@/app/(app)/create-transaction-form'
+import { getTransactionsCategorys } from '@/http/get-transactions-categorys'
+import { getWallet } from '@/http/get-wallet'
 
 import { Button } from './ui/button'
 import { Card, CardContent, CardHeader } from './ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from './ui/dialog'
 import { Skeleton } from './ui/skeleton'
 
 interface SummaryCardProps {
@@ -19,11 +31,9 @@ export default async function SummaryCard({
   size = 'small',
   isLoading,
 }: SummaryCardProps) {
-  // const walletId = cookies().get('wallet')?.value
-
-  // const wallet = await getWallet(walletId!)
-
-  // const categorys = await getTransactionsCategorys()
+  const walletId = cookies().get('wallet')?.value
+  const categorys = await getTransactionsCategorys()
+  const wallet = await getWallet(walletId!)
 
   return (
     <Card className={`${size === 'large' ? 'bg-white bg-opacity-5' : ''}`}>
@@ -50,7 +60,23 @@ export default async function SummaryCard({
             }).format(amount / 100)}
           </p>
         )}
-        {size === 'large' && <Button>Adicionar Transação</Button>}
+        {size === 'large' && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Adicionar Receita</Button>
+            </DialogTrigger>
+
+            <DialogContent aria-describedby="formulario de adicionar transação">
+              <DialogTitle>
+                <p className="text-2xl font-bold">Adiciona transação</p>
+                <DialogDescription>
+                  Adicionar uma nova transação.
+                </DialogDescription>
+              </DialogTitle>
+              <CreateIncomeForm wallet={wallet} categorys={categorys} />
+            </DialogContent>
+          </Dialog>
+        )}
       </CardContent>
     </Card>
   )

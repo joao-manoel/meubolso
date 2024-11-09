@@ -4,7 +4,6 @@ import { ptBR } from 'date-fns/locale'
 import { AlertTriangle, CalendarIcon, Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-import { TransactionType } from '@/@types/transactionsTypes'
 import { CardIcon } from '@/components/CardIcon'
 import { CategoryIcon } from '@/components/IconCategorys'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
@@ -35,15 +34,14 @@ import { createIncomeAction } from './action'
 export interface CreateIncomeFormProps {
   wallet: GetWalletResponse
   categorys: GetTransactionsCategorysResponse[]
-  type: TransactionType
 }
 
 export default function CreateIncomeForm({
   wallet,
   categorys,
-  type,
 }: CreateIncomeFormProps) {
   const [title, setTitle] = useState('')
+  const [type, setType] = useState('income')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState<Date>(startOfToday())
   const [category, setCategory] = useState('')
@@ -179,6 +177,33 @@ export default function CreateIncomeForm({
                 {errors.amount[0]}
               </p>
             )}
+          </div>
+        </div>
+        <div className="grid grid-cols-[50%_minmax(50%,_1fr)] gap-3">
+          <div className="gap-2 space-y-2">
+            <Label htmlFor="title">Tipo da transação</Label>
+            <Select>
+              <SelectTrigger className="">
+                <SelectValue placeholder="Qual tipo da transação" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="income">Receita</SelectItem>
+                <SelectItem value="expense">Despesa</SelectItem>
+                <SelectItem value="investment">Investimento</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="gap-2 space-y-2">
+            <Label htmlFor="amount">Status</Label>
+            <Select>
+              <SelectTrigger className="">
+                <SelectValue placeholder="Selecione o status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="paid">Pago</SelectItem>
+                <SelectItem value="pendent">Pendente</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <div className="grid grid-cols-[50%_minmax(50%,_1fr)] gap-2">
