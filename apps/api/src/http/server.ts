@@ -11,15 +11,15 @@ import {
 import { authenticateWithGoogle } from './routes/auth/authenticate-with-google'
 import { createAccount } from './routes/auth/create-account'
 import { getProfile } from './routes/auth/get-profile'
-import { getWalletTransactionsCategorys } from './routes/financial/personal/wallet/categorys/get-wallet-transactions-categorys'
 import { createWallet } from './routes/financial/personal/wallet/create-wallet'
 import { deleteWallet } from './routes/financial/personal/wallet/delete-wallet'
 import { getWallet } from './routes/financial/personal/wallet/get-wallet'
 import { getWallets } from './routes/financial/personal/wallet/get-wallets'
 import { createTransaction } from './routes/financial/personal/wallet/transactions/create-transaction'
 import { deleteTransaction } from './routes/financial/personal/wallet/transactions/delete-transactions'
-import { getBalances } from './routes/financial/personal/wallet/transactions/get-balances'
+import { getSummarys } from './routes/financial/personal/wallet/transactions/get-summarys'
 import { getTransactions } from './routes/financial/personal/wallet/transactions/get-transactions'
+import { getTransactionsPerType } from './routes/financial/personal/wallet/transactions/get-transactions-per-type'
 import { updatePaymentTransactions } from './routes/financial/personal/wallet/transactions/update-payment-transactions'
 import { getTransactionsCategorys } from './routes/financial/transactions/categorys/get-transactions-categorys'
 
@@ -43,12 +43,12 @@ app.register(getWallet)
 app.register(createWallet)
 app.register(deleteWallet)
 
+app.register(getTransactionsPerType)
 app.register(getTransactions)
 app.register(deleteTransaction)
 app.register(createTransaction)
-app.register(getBalances)
+app.register(getSummarys)
 
-app.register(getWalletTransactionsCategorys)
 app.register(getTransactionsCategorys)
 app.register(updatePaymentTransactions)
 

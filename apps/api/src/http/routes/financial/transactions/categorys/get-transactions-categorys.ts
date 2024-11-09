@@ -1,4 +1,3 @@
-import { TransactionType } from '@prisma/client'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -11,15 +10,12 @@ export async function getTransactionsCategorys(app: FastifyInstance) {
     .withTypeProvider<ZodTypeProvider>()
     .register(auth)
     .get(
-      '/transactions/:type/categorys',
+      '/transactions/categorys',
       {
         schema: {
           tags: ['Categorys'],
           summary: 'Get Wallet Transactions Categorys',
           security: [{ bearerAuth: [] }],
-          params: z.object({
-            type: z.nativeEnum(TransactionType),
-          }),
           response: {
             200: z.array(
               z.object({
@@ -33,13 +29,11 @@ export async function getTransactionsCategorys(app: FastifyInstance) {
         },
       },
       async (request, reply) => {
-        const { type } = request.params
-
+        const userId = await request.getCurrentUserId()
         try {
           const categorys = await prisma.categorys.findMany({
             where: {
-              isCategoryUser: false,
-              transactionType: type,
+              OR: [{ isCategoryUser: false }, { userId }],
             },
             select: {
               id: true,

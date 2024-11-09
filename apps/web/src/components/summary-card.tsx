@@ -12,13 +12,19 @@ interface SummaryCardProps {
   isLoading: boolean
 }
 
-export default function SummaryCard({
+export default async function SummaryCard({
   icon,
   title,
   amount,
   size = 'small',
   isLoading,
 }: SummaryCardProps) {
+  // const walletId = cookies().get('wallet')?.value
+
+  // const wallet = await getWallet(walletId!)
+
+  // const categorys = await getTransactionsCategorys()
+
   return (
     <Card className={`${size === 'large' ? 'bg-white bg-opacity-5' : ''}`}>
       <CardHeader className="w-full flex-row items-center gap-2">

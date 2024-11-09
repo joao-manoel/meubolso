@@ -13,14 +13,13 @@ import { z } from 'zod'
 import { auth } from '@/http/middlewares/auth'
 import { BadRequestError } from '@/http/routes/_errors/bad-request-error'
 import { prisma } from '@/lib/prisma'
-import { getMonthInterval } from '@/utils/utils'
 
-export async function getTransactions(app: FastifyInstance) {
+export async function getTransactionsPerType(app: FastifyInstance) {
   app
     .withTypeProvider<ZodTypeProvider>()
     .register(auth)
-    .post(
-      '/wallet/:walletId/transactions',
+    .get(
+      '/wallet/:walletId/transactions/type/:type',
       {
         schema: {
           tags: ['Transactions'],
@@ -28,11 +27,7 @@ export async function getTransactions(app: FastifyInstance) {
           security: [{ bearerAuth: [] }],
           params: z.object({
             walletId: z.string(),
-          }),
-          body: z.object({
-            take: z.number(),
-            year: z.string(),
-            month: z.string(),
+            type: z.nativeEnum(TransactionType),
           }),
           response: {
             200: z.array(
@@ -73,8 +68,7 @@ export async function getTransactions(app: FastifyInstance) {
       },
       async (request, reply) => {
         const userId = await request.getCurrentUserId()
-        const { walletId } = request.params
-        const { take, month, year } = request.body
+        const { walletId, type } = request.params
 
         const wallet = await prisma.wallet.findFirst({
           where: {
@@ -86,8 +80,6 @@ export async function getTransactions(app: FastifyInstance) {
         if (!wallet) {
           throw new BadRequestError('Wallet not found')
         }
-
-        const { startOfMonth, endOfMonth } = getMonthInterval(year, month)
 
         const transactions = await prisma.transaction.findMany({
           select: {
@@ -125,12 +117,11 @@ export async function getTransactions(app: FastifyInstance) {
           },
           where: {
             walletId: wallet.id,
-            payDate: { gte: startOfMonth, lte: endOfMonth },
+            type,
           },
           orderBy: {
             payDate: 'desc',
           },
-          take: Number(take),
         })
 
         const timeZone = 'UTC' // Definindo UTC para consistência

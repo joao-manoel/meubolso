@@ -21,14 +21,14 @@ export async function WalletSwitcher() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="flex w-[180px] items-center gap-2 rounded p-1 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary">
+      <DropdownMenuTrigger className="flex max-w-[180px] items-center gap-2 rounded p-1 text-sm font-medium outline-none focus-visible:ring-2 focus-visible:ring-primary">
         <span className="line-clamp-1 text-muted-foreground">
           {selectedWallet?.name || 'Selecionar carteira'}
         </span>
         <ChevronsUpDown className="ml-auto size-4 text-muted-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        align="end"
+        align="start"
         alignOffset={-16}
         sideOffset={12}
         className="w-[200px]"

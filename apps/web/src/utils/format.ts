@@ -22,7 +22,14 @@ export function formatDate(value: string) {
 
   return date.toLocaleDateString('pt-BR', {
     day: '2-digit',
-    month: 'long',
+    month: 'short',
     year: 'numeric',
   })
+}
+
+export const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value)
 }

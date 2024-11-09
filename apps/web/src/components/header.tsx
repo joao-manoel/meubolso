@@ -3,7 +3,6 @@ import Image from 'next/image'
 
 import meuBolsoIcon from '@/assets/image/meu-bolso-icon.svg'
 
-import { OrganizationSwitcher } from './organization-switcher'
 import ProfileButton from './profile-button'
 import { WalletSwitcher } from './wallet-switcher'
 export default function Header() {
@@ -17,8 +16,10 @@ export default function Header() {
             className="size-6 dark:invert"
           />
           <Slash className="size-3 -rotate-[24deg] text-border" />
+          {/* }
           <OrganizationSwitcher />
           <Slash className="size-3 -rotate-[24deg] text-border" />
+          { */}
           <WalletSwitcher />
         </div>
 

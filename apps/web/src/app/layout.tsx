@@ -17,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="pt-Br" suppressHydrationWarning={true}>
       <body cz-shortcut-listen="true">
-        <Providers>{children}</Providers>
+        <div className="flex h-full flex-col overflow-hidden">
+          <Providers>{children}</Providers>
+        </div>
       </body>
     </html>
   )

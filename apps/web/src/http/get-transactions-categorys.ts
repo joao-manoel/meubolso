@@ -7,15 +7,9 @@ export interface GetTransactionsCategorysResponse {
   isCategoryUser: boolean
 }
 
-interface GetTransactionsCategorysRequest {
-  type: 'INCOME' | 'EXPENSE'
-}
-
-export async function getTransactionsCategorys({
-  type,
-}: GetTransactionsCategorysRequest) {
+export async function getTransactionsCategorys() {
   const result = await api
-    .get(`transactions/${type}/categorys`, {
+    .get(`transactions/categorys`, {
       next: {
         tags: ['category'],
       },
