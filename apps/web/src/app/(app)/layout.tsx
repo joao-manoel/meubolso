@@ -10,5 +10,5 @@ export default function AuthLayout({
   if (!isAuthenticated()) {
     redirect('/sign-in')
   }
-  return <div className="">{children}</div>
+  return <>{children}</>
 }

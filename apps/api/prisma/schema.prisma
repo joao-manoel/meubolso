@@ -19,6 +19,7 @@ enum WalletType {
 enum TransactionType {
   INCOME
   EXPENSE
+  INVESTMENT
 }
 
 enum TransactionStatusType {

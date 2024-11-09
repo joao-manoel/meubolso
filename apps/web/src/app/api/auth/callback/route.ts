@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   const { token } = await signInWithGoogle({ code })
 
-  await cookies().set('token', token, {
+  cookies().set('token', token, {
     path: '/',
     maxAge: 60 * 60 * 24 * 7, // 7days
   })

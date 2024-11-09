@@ -1,7 +1,7 @@
 'use client'
 import Image from 'next/image'
 
-import googleIcon from '@/assets/google-icon.svg'
+import googleIcon from '@/assets/image/google-icon.svg'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

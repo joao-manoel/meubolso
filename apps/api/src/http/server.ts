@@ -18,6 +18,7 @@ import { getWallet } from './routes/financial/personal/wallet/get-wallet'
 import { getWallets } from './routes/financial/personal/wallet/get-wallets'
 import { createTransaction } from './routes/financial/personal/wallet/transactions/create-transaction'
 import { deleteTransaction } from './routes/financial/personal/wallet/transactions/delete-transactions'
+import { getBalances } from './routes/financial/personal/wallet/transactions/get-balances'
 import { getTransactions } from './routes/financial/personal/wallet/transactions/get-transactions'
 import { updatePaymentTransactions } from './routes/financial/personal/wallet/transactions/update-payment-transactions'
 import { getTransactionsCategorys } from './routes/financial/transactions/categorys/get-transactions-categorys'
@@ -45,6 +46,7 @@ app.register(deleteWallet)
 app.register(getTransactions)
 app.register(deleteTransaction)
 app.register(createTransaction)
+app.register(getBalances)
 
 app.register(getWalletTransactionsCategorys)
 app.register(getTransactionsCategorys)
