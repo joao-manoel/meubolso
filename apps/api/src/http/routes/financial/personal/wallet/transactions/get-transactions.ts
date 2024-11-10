@@ -125,7 +125,38 @@ export async function getTransactions(app: FastifyInstance) {
           },
           where: {
             walletId: wallet.id,
-            payDate: { gte: startOfMonth, lte: endOfMonth },
+            OR: [
+              // Inclui todas as transações de recorrência mensal, independentemente do mês
+              { recurrence: 'MONTH' },
+              // Inclui apenas transações anuais que correspondem ao mês específico do ano
+              {
+                recurrence: 'YEAR',
+                payDate: {
+                  gte: startOfMonth,
+                  lte: endOfMonth,
+                },
+              },
+              // Inclui apenas transações variáveis dentro do intervalo do mês
+              {
+                recurrence: 'VARIABLE',
+                payDate: {
+                  gte: startOfMonth,
+                  lte: endOfMonth,
+                },
+              },
+              // Inclui transações de recorrência variável que têm installments com payDate dentro do intervalo do mês
+              {
+                recurrence: 'VARIABLE',
+                installments: {
+                  some: {
+                    payDate: {
+                      gte: startOfMonth,
+                      lte: endOfMonth,
+                    },
+                  },
+                },
+              },
+            ],
           },
           orderBy: {
             payDate: 'desc',

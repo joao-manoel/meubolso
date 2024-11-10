@@ -47,17 +47,17 @@ export function TransactionPieChart({ data }: TransactionsPieChartProps) {
   const chartData = [
     {
       type: TransactionType.INCOME,
-      amount: data.incomeTotalAmount,
+      amount: data.incomeTotalAmount / 100,
       fill: '#55b02e',
     },
     {
       type: TransactionType.EXPENSE,
-      amount: data.expensesTotalAmount,
+      amount: data.expensesTotalAmount / 100,
       fill: '#e93030',
     },
     {
       type: TransactionType.INVESTMENT,
-      amount: data.investmentTotalAmount,
+      amount: data.investmentTotalAmount / 100,
       fill: '#FFFFFF',
     },
   ]

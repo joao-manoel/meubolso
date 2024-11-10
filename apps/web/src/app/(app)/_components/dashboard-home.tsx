@@ -57,7 +57,11 @@ export default async function DashboardHome({
         </div>
 
         <div className="h-full w-full">
-          <LastTransactions lasTransactions={lastTransactions} />
+          <LastTransactions
+            lasTransactions={lastTransactions}
+            month={month}
+            year={year}
+          />
         </div>
       </div>
     </>

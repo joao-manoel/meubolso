@@ -1,4 +1,8 @@
-import { TransactionStatusType, TransactionType } from '@prisma/client'
+import {
+  RecurrenceType,
+  TransactionStatusType,
+  TransactionType,
+} from '@prisma/client'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -45,7 +49,6 @@ const calculateCategorySummary = async (
     }
   })
 }
-
 export async function getSummarys(app: FastifyInstance) {
   app
     .withTypeProvider<ZodTypeProvider>()
@@ -97,45 +100,118 @@ export async function getSummarys(app: FastifyInstance) {
 
         const { startOfMonth, endOfMonth } = getMonthInterval(year, month)
         const where = {
-          payDate: { gte: startOfMonth, lte: endOfMonth },
-          walletId,
-          status: TransactionStatusType.paid,
+          OR: [
+            {
+              payDate: { gte: startOfMonth, lte: endOfMonth },
+              walletId,
+              status: TransactionStatusType.paid,
+            },
+            {
+              recurrence: RecurrenceType.MONTH,
+              walletId,
+              installments: {
+                some: {
+                  status: TransactionStatusType.paid,
+                  payDate: { gte: startOfMonth, lte: endOfMonth },
+                },
+              },
+            },
+            {
+              recurrence: RecurrenceType.VARIABLE,
+              walletId,
+              installments: {
+                some: {
+                  status: TransactionStatusType.paid,
+                  payDate: { gte: startOfMonth, lte: endOfMonth },
+                },
+              },
+            },
+          ],
         }
 
-        // Calcular somas para diferentes tipos de transação
         const [expenses, income, investment, transactions] = await Promise.all([
           prisma.transaction.aggregate({
-            where: { ...where, type: TransactionType.EXPENSE },
+            where: {
+              ...where,
+              type: TransactionType.EXPENSE,
+              recurrence: { not: RecurrenceType.VARIABLE },
+            },
             _sum: { amount: true },
           }),
           prisma.transaction.aggregate({
-            where: { ...where, type: TransactionType.INCOME },
+            where: {
+              ...where,
+              type: TransactionType.INCOME,
+              recurrence: { not: RecurrenceType.VARIABLE },
+            },
             _sum: { amount: true },
           }),
           prisma.transaction.aggregate({
-            where: { ...where, type: TransactionType.INVESTMENT },
+            where: {
+              ...where,
+              type: TransactionType.INVESTMENT,
+              recurrence: { not: RecurrenceType.VARIABLE },
+            },
             _sum: { amount: true },
           }),
           prisma.transaction.aggregate({ where, _sum: { amount: true } }),
         ])
 
-        const transactionsTotalAmount = transactions._sum.amount ?? 0
-        const incomeTotalAmount = income._sum.amount ?? 0
-        const expensesTotalAmount = expenses._sum.amount ?? 0
-        const investmentTotalAmount = investment._sum.amount ?? 0
+        const variableTransactionsWithInstallments =
+          await prisma.transaction.findMany({
+            where: {
+              walletId,
+              recurrence: RecurrenceType.VARIABLE,
+              installments: {
+                some: {
+                  status: TransactionStatusType.paid,
+                  payDate: { gte: startOfMonth, lte: endOfMonth },
+                },
+              },
+            },
+            include: {
+              installments: true,
+            },
+          })
+
+        let incomeTotalAmount = income._sum.amount ?? 0
+        let expensesTotalAmount = expenses._sum.amount ?? 0
+
+        variableTransactionsWithInstallments.forEach((transaction) => {
+          const installmentCount = transaction.installments.length
+          const installmentAmount = installmentCount
+            ? transaction.amount / installmentCount
+            : 0
+
+          transaction.installments.forEach((installment) => {
+            if (
+              installment.status === TransactionStatusType.paid &&
+              installment.payDate &&
+              installment.payDate >= startOfMonth &&
+              installment.payDate <= endOfMonth
+            ) {
+              if (transaction.type === TransactionType.INCOME) {
+                incomeTotalAmount += installmentAmount
+              } else if (transaction.type === TransactionType.EXPENSE) {
+                expensesTotalAmount += installmentAmount
+              }
+            }
+          })
+        })
+
         const balanceTotalAmount = incomeTotalAmount - expensesTotalAmount
 
         const formattedCategorySummary = await calculateCategorySummary(
           where,
-          transactionsTotalAmount,
+          transactions._sum.amount ?? 0,
           userId,
         )
 
         return reply.send({
-          transactionsTotalAmount,
+          transactionsTotalAmount: transactions._sum.amount ?? 0,
           incomeTotalAmount,
           expensesTotalAmount,
-          investmentTotalAmount,
+          investmentTotalAmount: investment._sum.amount ?? 0,
           balanceTotalAmount,
           categorySummary: formattedCategorySummary,
         })
