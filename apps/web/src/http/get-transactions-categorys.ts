@@ -1,3 +1,5 @@
+import { TransactionType } from '@/@types/transactionsTypes'
+
 import { api } from './api-client'
 
 export interface GetTransactionsCategorysResponse {
@@ -5,6 +7,7 @@ export interface GetTransactionsCategorysResponse {
   title: string
   icon: string
   isCategoryUser: boolean
+  transactionType: TransactionType
 }
 
 export async function getTransactionsCategorys() {

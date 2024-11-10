@@ -74,7 +74,7 @@ export function TransactionPieChart({ data }: TransactionsPieChartProps) {
     ),
   }
   return (
-    <Card className="flex flex-col p-6">
+    <Card className="flex max-h-[420px] flex-col p-6">
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}

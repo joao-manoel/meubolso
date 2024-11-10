@@ -36,11 +36,13 @@ export default async function SummaryCard({
   const wallet = await getWallet(walletId!)
 
   return (
-    <Card className={`${size === 'large' ? 'bg-white bg-opacity-5' : ''}`}>
+    <Card
+      className={`${size === 'large' ? 'bg-zinc-100 dark:bg-zinc-950' : ''}`}
+    >
       <CardHeader className="w-full flex-row items-center gap-2">
         {icon}
         <p
-          className={`${size === 'small' ? 'text-muted-foreground' : 'text-white opacity-70'}`}
+          className={`${size === 'small' ? 'text-muted-foreground' : 'text-black opacity-70 dark:text-white'}`}
         >
           {title}
         </p>
@@ -52,7 +54,7 @@ export default async function SummaryCard({
           />
         ) : (
           <p
-            className={`font-bold ${size === 'small' ? 'text-2xl' : 'text-4xl'}`}
+            className={`font-bold ${size === 'small' ? 'text-xl' : 'text-3xl'}`}
           >
             {Intl.NumberFormat('pt-BR', {
               style: 'currency',

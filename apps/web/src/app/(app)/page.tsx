@@ -24,9 +24,9 @@ export default async function DashboardPage({
   }
 
   return (
-    <div className="py-4">
+    <div className="h-screen py-4">
       <Header />
-      <main className="flex flex-col overflow-hidden">
+      <main className="flex flex-col px-5 pb-6">
         <DashboardHome month={month} year={year} />
       </main>
     </div>

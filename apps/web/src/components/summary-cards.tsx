@@ -15,7 +15,7 @@ interface SummaryCardProps {
 
 export default function SummaryCards({ summary }: SummaryCardProps) {
   return (
-    <div className="space-y-6">
+    <div className="h-full space-y-6">
       <SummaryCard
         title="Saldo"
         icon={<WalletIcon size={16} />}

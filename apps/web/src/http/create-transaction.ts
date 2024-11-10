@@ -11,7 +11,7 @@ interface CreateTransactionRequest {
   walletId: string
   title: string
   amount: number
-  type: 'INCOME' | 'EXPENSE'
+  type: 'INCOME' | 'EXPENSE' | 'INVESTMENT'
   payDate: string
   recurrence: 'VARIABLE' | 'MONTH' | 'YEAR'
   categoryId: string

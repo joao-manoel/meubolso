@@ -29,6 +29,25 @@ async function seed() {
       { title: 'Presentes', icon: 'GIFTS', transactionType: 'INCOME' },
       { title: 'Vendas', icon: 'SALES', transactionType: 'INCOME' },
       { title: 'Outros', icon: 'OTHER', transactionType: 'INCOME' },
+
+      // Categorias de Investimentos (INVESTMENTS)
+      { title: 'Ações', icon: 'STOCKS', transactionType: 'INVESTMENT' },
+      {
+        title: 'Fundos Imobiliários',
+        icon: 'REAL_ESTATE_FUNDS',
+        transactionType: 'INVESTMENT',
+      },
+      { title: 'Criptomoedas', icon: 'CRYPTO', transactionType: 'INVESTMENT' },
+      {
+        title: 'Renda Fixa',
+        icon: 'FIXED_INVESTMENT',
+        transactionType: 'INVESTMENT',
+      },
+      {
+        title: 'Outros',
+        icon: 'OTHER_INVESTMENTS',
+        transactionType: 'INVESTMENT',
+      },
     ],
     skipDuplicates: true, // Ignora duplicatas para evitar erro se já existirem registros iguais
   })

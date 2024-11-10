@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
 import { useFormState } from '@/hooks/use-form-state'
 import { GetTransactionsCategorysResponse } from '@/http/get-transactions-categorys'
 import { GetWalletResponse } from '@/http/get-wallet'
@@ -41,7 +40,8 @@ export default function CreateIncomeForm({
   categorys,
 }: CreateIncomeFormProps) {
   const [title, setTitle] = useState('')
-  const [type, setType] = useState('income')
+  const [typeTransaction, setTypeTransaction] = useState('INCOME')
+  const [payStatus, setPayStatus] = useState('pending')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState<Date>(startOfToday())
   const [category, setCategory] = useState('')
@@ -53,6 +53,10 @@ export default function CreateIncomeForm({
     'MONTH',
   )
   const [installments, setInstallments] = useState<number>(1)
+
+  const FilterCategory = categorys.filter(
+    (category) => category.transactionType === typeTransaction,
+  )
 
   const installmentOptions = useMemo(
     () =>
@@ -112,13 +116,6 @@ export default function CreateIncomeForm({
     },
   )
 
-  const userTransactionCategorys = categorys.filter(
-    (c) => c.isCategoryUser === true,
-  )
-  const transactionGlobalCategorys = categorys.filter(
-    (c) => c.isCategoryUser === false,
-  )
-
   return (
     <div>
       {success === false && message && (
@@ -140,16 +137,12 @@ export default function CreateIncomeForm({
           </AlertDescription>
         </Alert>
       )}
+
       <form className="flex flex-col gap-4 py-2.5" onSubmit={handleSubmit}>
         <div className="grid grid-cols-[70%_minmax(30%,_1fr)] gap-3">
           <div className="gap-2 space-y-2">
             <Label htmlFor="title">Titulo</Label>
-            <input
-              value={type}
-              name="type"
-              onChange={(e) => console.log(e)}
-              hidden
-            />
+
             <Input
               placeholder="Digite um titulo"
               onChange={(e) => setTitle(e.target.value)}
@@ -181,29 +174,47 @@ export default function CreateIncomeForm({
         </div>
         <div className="grid grid-cols-[50%_minmax(50%,_1fr)] gap-3">
           <div className="gap-2 space-y-2">
-            <Label htmlFor="title">Tipo da transação</Label>
-            <Select>
-              <SelectTrigger className="">
-                <SelectValue placeholder="Qual tipo da transação" />
+            <Label htmlFor="type">Tipo da transação</Label>
+            <Select
+              value={typeTransaction}
+              onValueChange={(value) => setTypeTransaction(value)}
+              name="type"
+            >
+              <SelectTrigger className="" id="typeTransaction">
+                <SelectValue placeholder="Tipo da transação" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="income">Receita</SelectItem>
-                <SelectItem value="expense">Despesa</SelectItem>
-                <SelectItem value="investment">Investimento</SelectItem>
+                <SelectItem value="INCOME">Receita</SelectItem>
+                <SelectItem value="EXPENSE">Despesa</SelectItem>
+                <SelectItem value="INVESTMENT">Investimento</SelectItem>
               </SelectContent>
             </Select>
+            {errors?.typeTransaction && (
+              <p className="text-xs font-medium text-red-500 dark:text-red-400">
+                {errors.typeTransaction[0]}
+              </p>
+            )}
           </div>
           <div className="gap-2 space-y-2">
-            <Label htmlFor="amount">Status</Label>
-            <Select>
-              <SelectTrigger className="">
+            <Label htmlFor="status">Status</Label>
+            <Select
+              value={payStatus}
+              onValueChange={(value) => setPayStatus(value)}
+              name="status"
+            >
+              <SelectTrigger className="" id="status">
                 <SelectValue placeholder="Selecione o status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="paid">Pago</SelectItem>
-                <SelectItem value="pendent">Pendente</SelectItem>
+                <SelectItem value="pending">Pendente</SelectItem>
               </SelectContent>
             </Select>
+            {errors?.status && (
+              <p className="text-xs font-medium text-red-500 dark:text-red-400">
+                {errors.status[0]}
+              </p>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-[50%_minmax(50%,_1fr)] gap-2">
@@ -214,33 +225,18 @@ export default function CreateIncomeForm({
               onValueChange={(value) => setCategory(value)}
               name="categoryId"
             >
-              <SelectTrigger>
+              <SelectTrigger id="category">
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
-                {userTransactionCategorys.length >= 1 && (
+                {FilterCategory.length >= 1 && (
                   <>
-                    {userTransactionCategorys.map((c) => (
+                    {FilterCategory.map((c) => (
                       <SelectItem
                         value={c.id}
                         key={c.id}
                         className="flex gap-2"
                       >
-                        <div className="flex items-center gap-2">
-                          <CategoryIcon icon={c.icon} size={15} />
-                          <span>{c.title}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </>
-                )}
-                {userTransactionCategorys && (
-                  <>
-                    <div className="flex justify-center">
-                      <Separator />
-                    </div>
-                    {transactionGlobalCategorys.map((c) => (
-                      <SelectItem value={c.id} key={c.id}>
                         <div className="flex items-center gap-2">
                           <CategoryIcon icon={c.icon} size={15} />
                           <span>{c.title}</span>
@@ -300,14 +296,14 @@ export default function CreateIncomeForm({
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="category">Cartão</Label>
+          <Label htmlFor="card">Cartão</Label>
           {wallet.card ? (
             <Select
               value={card}
               onValueChange={(value) => setCard(value)}
               name="cardId"
             >
-              <SelectTrigger>
+              <SelectTrigger id="card">
                 <SelectValue placeholder="Selecione um cartão" />
               </SelectTrigger>
               <SelectContent>

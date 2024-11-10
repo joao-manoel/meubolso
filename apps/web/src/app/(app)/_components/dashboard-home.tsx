@@ -45,8 +45,8 @@ export default async function DashboardHome({
         </div>
         <NavigationDate date={`${year}-${month}-01`} />
       </header>
-      <div className="grid grid-cols-[2fr,1fr] gap-2 px-5">
-        <div className="flex flex-col gap-6 overflow-hidden">
+      <div className="grid grid-cols-[2fr,1fr] gap-6">
+        <div className="flex flex-col gap-6">
           <SummaryCards summary={summary} />
           <div className="grid-row-1 grid grid-cols-3 gap-6">
             <TransactionPieChart data={summary} />
@@ -56,7 +56,7 @@ export default async function DashboardHome({
           </div>
         </div>
 
-        <div className="w-full">
+        <div className="h-full w-full">
           <LastTransactions lasTransactions={lastTransactions} />
         </div>
       </div>

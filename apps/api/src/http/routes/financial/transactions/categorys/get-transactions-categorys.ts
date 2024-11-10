@@ -1,3 +1,4 @@
+import { TransactionType } from '@prisma/client'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -23,6 +24,7 @@ export async function getTransactionsCategorys(app: FastifyInstance) {
                 title: z.string(),
                 icon: z.string(),
                 isCategoryUser: z.boolean(),
+                transactionType: z.nativeEnum(TransactionType),
               }),
             ),
           },
@@ -40,6 +42,7 @@ export async function getTransactionsCategorys(app: FastifyInstance) {
               title: true,
               icon: true,
               isCategoryUser: true,
+              transactionType: true,
             },
           })
 

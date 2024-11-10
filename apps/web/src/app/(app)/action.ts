@@ -14,18 +14,33 @@ const createIncomeActionSchema = z.object({
   amount: z
     .string()
     .transform((value) => {
-      // Remove "R$" e qualquer espaço em branco, em seguida, substitui "," por "."
-      const numericValue = parseFloat(
-        value.replace(/[R$\s]/g, '').replace(',', '.'),
-      )
-      return numericValue
+      // Remove "R$" e espaços em branco
+      let sanitizedValue = value.replace(/[R$\s]/g, '')
+
+      // Se houver múltiplas vírgulas ou pontos, mantém apenas o último como separador decimal
+      const hasComma = sanitizedValue.includes(',')
+      const hasDot = sanitizedValue.includes('.')
+      if (hasComma || hasDot) {
+        sanitizedValue = sanitizedValue.replace(/[.,](?=.*[.,])/g, '')
+      }
+
+      // Substitui a vírgula final por ponto, caso seja o separador decimal
+      sanitizedValue = sanitizedValue.replace(',', '.')
+
+      // Converte para número e multiplica por 100 para obter centavos
+      const numericValue = parseFloat(sanitizedValue) * 100
+
+      return Math.round(numericValue)
     })
     .refine((value) => value > 0, {
       message: 'O valor deve ser positivo.',
     }),
   categoryId: z.string(),
-  type: z.enum(['INCOME', 'EXPENSE']),
-  payDate: z.string(),
+  type: z.enum(['INCOME', 'EXPENSE', 'INVESTMENT'], {
+    message: 'Transação invalida',
+  }),
+  payDate: z.string({ message: 'Data de pagamento inválida.' }),
+  status: z.enum(['paid', 'pending'], { message: 'Status inválido.' }),
   cardId: z.string(),
   recurrence: z.enum(['VARIABLE', 'MONTH', 'YEAR']).optional(),
   installments: z.string().optional(),
@@ -75,6 +90,7 @@ export async function createIncomeAction(data: FormData) {
     amount,
     categoryId,
     payDate,
+    status,
     cardId,
     recurrence,
     installments,
@@ -96,13 +112,13 @@ export async function createIncomeAction(data: FormData) {
     const transaction = await createTransaction({
       walletId,
       title,
-      amount: amount * 100,
+      amount,
+      status,
       type,
       payDate,
       ...(recurrence ? { recurrence } : { recurrence: 'VARIABLE' }),
       categoryId,
       cardId,
-      status: 'pending',
       ...(installments && {
         installments: createInstallmentsArray(installments, payDate),
       }),
