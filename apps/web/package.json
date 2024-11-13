@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "env:load": "dotenv -e ../../.env --"
+    "env:load": "dotenv -e ../../.env --",
+    "fix:eslint": "npx eslint --fix src --ext .ts,.tsx"
   },
   "dependencies": {
     "@mb/auth": "workspace:*",
