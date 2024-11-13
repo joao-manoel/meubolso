@@ -3,16 +3,17 @@ import { z } from 'zod'
 
 export const env = createEnv({
   server: {
-    PORT: z.coerce.number().default(3333),
     JWT_SECRET: z.string(),
-    GOOGLE_OAUTH_CLIENT_SECRET: z.string(),
     DATABASE_URL: z.string(),
+    PORT: z.coerce.number().default(3333),
+
+    GOOGLE_OAUTH_CLIENT_SECRET: z.string(),
+    GOOGLE_OAUTH_CLIENT_ID: z.string(),
+    GOOGLE_OAUTH_REDIRECT_URI: z.string(),
   },
   client: {},
   shared: {
     NEXT_PUBLIC_API_URL: z.string(),
-    GOOGLE_OAUTH_CLIENT_ID: z.string(),
-    GOOGLE_OAUTH_REDIRECT_URI: z.string(),
   },
   runtimeEnv: {
     PORT: process.env.PORT,
