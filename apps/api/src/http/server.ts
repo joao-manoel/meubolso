@@ -52,6 +52,6 @@ app.register(getSummarys)
 app.register(getTransactionsCategorys)
 app.register(updatePaymentTransactions)
 
-app.listen({ port: env.PORT }).then(() => {
+app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
   console.log(`🔥 Server listening on ${env.PORT}`)
 })
