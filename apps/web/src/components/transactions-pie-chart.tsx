@@ -74,7 +74,6 @@ export function TransactionPieChart({ data }: TransactionsPieChartProps) {
     ),
   }
 
-  console.log(data)
   return (
     <Card className="flex h-[420px] max-h-[420px] flex-col p-6">
       <CardContent className="flex-1 pb-0">
