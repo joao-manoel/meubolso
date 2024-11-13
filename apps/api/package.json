@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "pnpm env:load tsx watch src/http/server.ts",
-    "env:load": "dotenv -e ../../.env --"
+    "db:migrate": "pnpm env:load prisma migrate dev",
+    "db:studio": "pnpm env:load prisma studio",
+    "env:load": "dotenv -e ../../.env --",
+    "build": "tsc",
+    "start": "node dist/http/server.js"
   },
   "dependencies": {
     "@mb/auth": "workspace:*",
