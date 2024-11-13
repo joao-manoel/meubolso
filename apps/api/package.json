@@ -6,7 +6,7 @@
     "db:migrate": "pnpm env:load prisma migrate dev",
     "db:studio": "pnpm env:load prisma studio",
     "env:load": "dotenv -e ../../.env --",
-    "build": "pnpm tsup",
+    "build": "tsup",
     "start": "node dist/http/server.js"
   },
   "dependencies": {
@@ -29,7 +29,6 @@
     "raw-body": "^3.0.0",
     "stripe": "^16.7.0",
     "tailwindcss-animate": "^1.0.7",
-    "tsup": "^8.3.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -40,6 +39,7 @@
     "@types/nodemailer": "^6.4.15",
     "dotenv-cli": "^7.4.2",
     "prisma": "^5.16.2",
+    "tsup": "^8.3.0",
     "tsx": "^4.16.0"
   },
   "prisma": {
