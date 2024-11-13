@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
       { status: 400 },
     )
   }
-
   const { token } = await signInWithGoogle({ code })
 
   cookies().set('token', token, {

@@ -11,19 +11,17 @@ export const env = createEnv({
   client: {},
   shared: {
     NEXT_PUBLIC_API_URL: z.string(),
-    NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID: z.string(),
-    NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URI: z.string(),
+    GOOGLE_OAUTH_CLIENT_ID: z.string(),
+    GOOGLE_OAUTH_REDIRECT_URI: z.string(),
   },
   runtimeEnv: {
     PORT: process.env.PORT,
     DATABASE_URL: process.env.DATABASE_URL,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     JWT_SECRET: process.env.JWT_SECRET,
-    NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID:
-      process.env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
+    GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID,
     GOOGLE_OAUTH_CLIENT_SECRET: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-    NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URI:
-      process.env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URI,
+    GOOGLE_OAUTH_REDIRECT_URI: process.env.GOOGLE_OAUTH_REDIRECT_URI,
   },
   emptyStringAsUndefined: true,
 })

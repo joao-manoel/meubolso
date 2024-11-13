@@ -30,17 +30,14 @@ export async function authenticateWithGoogle(app: FastifyInstance) {
 
       const googleOAuthURL = new URL('https://oauth2.googleapis.com/token')
 
-      googleOAuthURL.searchParams.set(
-        'client_id',
-        env.NEXT_PUBLIC_GOOGLE_OAUTH_CLIENT_ID,
-      )
+      googleOAuthURL.searchParams.set('client_id', env.GOOGLE_OAUTH_CLIENT_ID)
       googleOAuthURL.searchParams.set(
         'client_secret',
         env.GOOGLE_OAUTH_CLIENT_SECRET,
       )
       googleOAuthURL.searchParams.set(
         'redirect_uri',
-        env.NEXT_PUBLIC_GOOGLE_OAUTH_REDIRECT_URI,
+        env.GOOGLE_OAUTH_REDIRECT_URI,
       )
       googleOAuthURL.searchParams.set('grant_type', 'authorization_code')
       googleOAuthURL.searchParams.set('code', code)
