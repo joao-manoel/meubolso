@@ -12,16 +12,18 @@ import { BadRequestError } from '@/http/routes/_errors/bad-request-error'
 import { prisma } from '@/lib/prisma'
 import { getMonthInterval } from '@/utils/utils'
 
-// Função auxiliar para calcular o resumo de categoria
 const calculateCategorySummary = async (
   where: object,
   transactionsTotalAmount: number,
   userId: string,
+  startOfMonth: Date,
+  endOfMonth: Date,
 ) => {
   const categorySummary = await prisma.transaction.groupBy({
     by: ['categoryId'],
     where: {
       ...where,
+      type: TransactionType.EXPENSE,
       category: {
         OR: [{ isCategoryUser: false }, { userId }],
       },
@@ -35,19 +37,61 @@ const calculateCategorySummary = async (
     select: { id: true, title: true },
   })
 
-  return categorySummary.map((item) => {
-    const category = categories.find((cat) => cat.id === item.categoryId)
-    const totalAmount = item._sum.amount ?? 0
-    const percentageOfTotal = transactionsTotalAmount
-      ? (totalAmount / transactionsTotalAmount) * 100
-      : 0
+  const formattedSummary = await Promise.all(
+    categorySummary.map(async (item) => {
+      const category = categories.find((cat) => cat.id === item.categoryId)
+      let totalAmount = 0
 
-    return {
-      category: category?.title || 'Unknown',
-      totalAmount,
-      percentageOfTotal: Math.round(percentageOfTotal),
-    }
-  })
+      // Transações VARIABLE com parcelas para a categoria específica
+      const variableTransactionsWithInstallments =
+        await prisma.transaction.findMany({
+          where: {
+            categoryId: item.categoryId,
+            recurrence: RecurrenceType.VARIABLE,
+            installments: {
+              some: {
+                status: TransactionStatusType.paid,
+                payDate: { gte: startOfMonth, lte: endOfMonth },
+              },
+            },
+          },
+          include: {
+            installments: true,
+          },
+        })
+
+      variableTransactionsWithInstallments.forEach((transaction) => {
+        const installmentCount = transaction.installments.length
+        const installmentAmount = installmentCount
+          ? transaction.amount / installmentCount
+          : 0
+
+        // Soma somente o valor das parcelas pagas dentro do mês
+        transaction.installments.forEach((installment) => {
+          if (
+            installment.status === TransactionStatusType.paid &&
+            installment.payDate &&
+            installment.payDate >= startOfMonth &&
+            installment.payDate <= endOfMonth
+          ) {
+            totalAmount += installmentAmount
+          }
+        })
+      })
+
+      const percentageOfTotal = transactionsTotalAmount
+        ? (totalAmount / transactionsTotalAmount) * 100
+        : 0
+
+      return {
+        category: category?.title || 'Unknown',
+        totalAmount,
+        percentageOfTotal: Math.round(percentageOfTotal),
+      }
+    }),
+  )
+
+  return formattedSummary
 }
 export async function getSummarys(app: FastifyInstance) {
   app
@@ -100,15 +144,16 @@ export async function getSummarys(app: FastifyInstance) {
 
         const { startOfMonth, endOfMonth } = getMonthInterval(year, month)
         const where = {
+          walletId,
           OR: [
             {
+              // Transações pagas que estão dentro do intervalo de data
               payDate: { gte: startOfMonth, lte: endOfMonth },
-              walletId,
               status: TransactionStatusType.paid,
             },
             {
+              // Transações mensais com parcelas pagas dentro do intervalo de data
               recurrence: RecurrenceType.MONTH,
-              walletId,
               installments: {
                 some: {
                   status: TransactionStatusType.paid,
@@ -117,14 +162,21 @@ export async function getSummarys(app: FastifyInstance) {
               },
             },
             {
+              // Transações variáveis com parcelas
               recurrence: RecurrenceType.VARIABLE,
-              walletId,
               installments: {
                 some: {
                   status: TransactionStatusType.paid,
                   payDate: { gte: startOfMonth, lte: endOfMonth },
                 },
               },
+            },
+            {
+              // Transações variáveis sem parcelas
+              recurrence: RecurrenceType.VARIABLE,
+              installments: { none: {} },
+              payDate: { gte: startOfMonth, lte: endOfMonth },
+              status: TransactionStatusType.paid,
             },
           ],
         }
@@ -132,31 +184,96 @@ export async function getSummarys(app: FastifyInstance) {
         const [expenses, income, investment, transactions] = await Promise.all([
           prisma.transaction.aggregate({
             where: {
-              ...where,
+              walletId,
               type: TransactionType.EXPENSE,
-              recurrence: { not: RecurrenceType.VARIABLE },
+              OR: [
+                {
+                  recurrence: { not: RecurrenceType.VARIABLE },
+                  payDate: { gte: startOfMonth, lte: endOfMonth },
+                  status: TransactionStatusType.paid,
+                },
+                {
+                  recurrence: RecurrenceType.VARIABLE,
+                  installments: { none: {} },
+                  payDate: { gte: startOfMonth, lte: endOfMonth },
+                  status: TransactionStatusType.paid,
+                },
+              ],
             },
             _sum: { amount: true },
           }),
           prisma.transaction.aggregate({
             where: {
-              ...where,
+              walletId,
               type: TransactionType.INCOME,
-              recurrence: { not: RecurrenceType.VARIABLE },
+              OR: [
+                {
+                  recurrence: { not: RecurrenceType.VARIABLE },
+                  payDate: { gte: startOfMonth, lte: endOfMonth },
+                  status: TransactionStatusType.paid,
+                },
+                {
+                  recurrence: RecurrenceType.VARIABLE,
+                  installments: { none: {} },
+                  payDate: { gte: startOfMonth, lte: endOfMonth },
+                  status: TransactionStatusType.paid,
+                },
+              ],
             },
             _sum: { amount: true },
           }),
           prisma.transaction.aggregate({
             where: {
-              ...where,
+              walletId,
               type: TransactionType.INVESTMENT,
               recurrence: { not: RecurrenceType.VARIABLE },
+              payDate: { gte: startOfMonth, lte: endOfMonth },
+              status: TransactionStatusType.paid,
             },
             _sum: { amount: true },
           }),
-          prisma.transaction.aggregate({ where, _sum: { amount: true } }),
+          prisma.transaction.aggregate({
+            where: {
+              walletId,
+              OR: [
+                {
+                  payDate: { gte: startOfMonth, lte: endOfMonth },
+                  status: TransactionStatusType.paid,
+                },
+                {
+                  recurrence: RecurrenceType.MONTH,
+                  installments: {
+                    some: {
+                      status: TransactionStatusType.paid,
+                      payDate: { gte: startOfMonth, lte: endOfMonth },
+                    },
+                  },
+                },
+                {
+                  recurrence: RecurrenceType.VARIABLE,
+                  OR: [
+                    {
+                      installments: {
+                        some: {
+                          status: TransactionStatusType.paid,
+                          payDate: { gte: startOfMonth, lte: endOfMonth },
+                        },
+                      },
+                    },
+                    {
+                      installments: { none: {} },
+                      payDate: { gte: startOfMonth, lte: endOfMonth },
+                      status: TransactionStatusType.paid,
+                    },
+                  ],
+                },
+              ],
+            },
+            _sum: { amount: true },
+          }),
         ])
 
+        // Cálculo das parcelas para transações VARIABLE com installments, se necessário
         const variableTransactionsWithInstallments =
           await prisma.transaction.findMany({
             where: {
@@ -205,6 +322,8 @@ export async function getSummarys(app: FastifyInstance) {
           where,
           transactions._sum.amount ?? 0,
           userId,
+          startOfMonth,
+          endOfMonth,
         )
 
         return reply.send({

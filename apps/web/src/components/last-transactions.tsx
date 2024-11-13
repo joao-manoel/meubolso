@@ -145,7 +145,11 @@ export default function LastTransactions({
                     variant="secondary"
                     className={`${transaction.status === 'paid' ? 'bg-green-500 hover:bg-green-500' : 'bg-orange-500 hover:bg-orange-500'}`}
                   >
-                    {convertTransactionStatus(transaction.status)}
+                    {transaction.type === 'INCOME'
+                      ? transaction.status === 'paid'
+                        ? 'Recebido'
+                        : 'Pendente'
+                      : convertTransactionStatus(transaction.status)}
                   </Badge>
                 </div>
                 <span className="text-xs text-muted-foreground">
