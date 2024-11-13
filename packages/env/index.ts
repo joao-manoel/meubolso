@@ -6,7 +6,7 @@ export const env = createEnv({
     PORT: z.coerce.number().default(3333),
     JWT_SECRET: z.string(),
     GOOGLE_OAUTH_CLIENT_SECRET: z.string(),
-    DATABASE_URL: z.string().url(),
+    DATABASE_URL: z.string(),
   },
   client: {},
   shared: {
