@@ -1,7 +1,4 @@
-import {
-  GetTransactionsResponse,
-  TransactionType,
-} from '@/@types/transactionsTypes'
+import { Transactions, TransactionType } from '@/@types/transactionsTypes'
 
 import { api } from './api-client'
 
@@ -20,7 +17,7 @@ export async function getTransactionsPerType({
         tags: [`${walletId}/transactions`],
       },
     })
-    .json<GetTransactionsResponse[]>()
+    .json<Transactions[]>()
 
   return result
 }
