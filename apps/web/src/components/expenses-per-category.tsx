@@ -17,7 +17,12 @@ export default function ExpensesPerCategory({
         <CardTitle className="font-bold">Gastos por Categoria</CardTitle>
       </CardHeader>
 
-      <CardContent className="space-y-6">
+      <CardContent className="h-full space-y-6">
+        {expensesPerCategory.length === 0 && (
+          <div className="-mt-10 flex h-full items-center justify-center text-sm text-gray-400">
+            <p>Nenhum gasto registrado para este mês.</p>
+          </div>
+        )}
         {expensesPerCategory.map((category) => (
           <div key={category.category} className="space-y-2">
             <div className="flex w-full justify-between">

@@ -4,7 +4,7 @@ import { ptBR } from 'date-fns/locale'
 import { AlertTriangle, CalendarIcon, Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-import { CardIcon } from '@/components/CardIcon'
+import { CardIcon } from '@/components/card-icons'
 import { CategoryIcon } from '@/components/IconCategorys'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -35,23 +35,23 @@ export interface CreateIncomeFormProps {
   categorys: GetTransactionsCategorysResponse[]
 }
 
+type EntryType = 'variable' | 'recorrente' | 'parcelado'
+type StatusType = 'pending' | 'paid'
+type RecurrenceType = 'MONTH' | 'YEAR'
+
 export default function CreateIncomeForm({
   wallet,
   categorys,
 }: CreateIncomeFormProps) {
   const [title, setTitle] = useState('')
   const [typeTransaction, setTypeTransaction] = useState('INCOME')
-  const [payStatus, setPayStatus] = useState('pending')
+  const [payStatus, setPayStatus] = useState<StatusType>('pending')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState<Date>(startOfToday())
   const [category, setCategory] = useState('')
   const [card, setCard] = useState('')
-  const [entryType, setEntryType] = useState<
-    'variable' | 'recorrente' | 'parcelado'
-  >('variable')
-  const [recurrenceType, setRecurrenceType] = useState<'MONTH' | 'YEAR'>(
-    'MONTH',
-  )
+  const [entryType, setEntryType] = useState<EntryType>('variable')
+  const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>('MONTH')
   const [installments, setInstallments] = useState<number>(1)
 
   const FilterCategory = categorys.filter(
@@ -115,6 +115,15 @@ export default function CreateIncomeForm({
       setInstallments(1)
     },
   )
+
+  const handleEntryType = (entryType: EntryType) => {
+    setEntryType(entryType)
+    if (entryType === 'parcelado' || entryType === 'recorrente') {
+      setPayStatus('pending')
+    } else {
+      setPayStatus('paid')
+    }
+  }
 
   return (
     <div>
@@ -199,10 +208,16 @@ export default function CreateIncomeForm({
             <Label htmlFor="status">Status</Label>
             <Select
               value={payStatus}
-              onValueChange={(value) => setPayStatus(value)}
+              onValueChange={(value: StatusType) => setPayStatus(value)}
               name="status"
             >
-              <SelectTrigger className="" id="status">
+              <SelectTrigger
+                className=""
+                id="status"
+                disabled={
+                  entryType === 'parcelado' || entryType === 'recorrente'
+                }
+              >
                 <SelectValue placeholder="Selecione o status" />
               </SelectTrigger>
               <SelectContent>
@@ -340,7 +355,7 @@ export default function CreateIncomeForm({
               <Button
                 type="button"
                 variant={entryType === 'variable' ? 'default' : 'outline'}
-                onClick={() => setEntryType('variable')}
+                onClick={() => handleEntryType('variable')}
                 className="w-full"
               >
                 Único
@@ -348,7 +363,7 @@ export default function CreateIncomeForm({
               <Button
                 type="button"
                 variant={entryType === 'recorrente' ? 'default' : 'outline'}
-                onClick={() => setEntryType('recorrente')}
+                onClick={() => handleEntryType('recorrente')}
                 className="w-full"
               >
                 Recorrente
@@ -356,7 +371,7 @@ export default function CreateIncomeForm({
               <Button
                 type="button"
                 variant={entryType === 'parcelado' ? 'default' : 'outline'}
-                onClick={() => setEntryType('parcelado')}
+                onClick={() => handleEntryType('parcelado')}
                 className="w-full"
               >
                 Parcelado
@@ -369,7 +384,7 @@ export default function CreateIncomeForm({
               <Label htmlFor="recurrenceType">Tipo de Recorrência</Label>
               <Select
                 value={recurrenceType}
-                onValueChange={(value: 'MONTH' | 'YEAR') =>
+                onValueChange={(value: RecurrenceType) =>
                   setRecurrenceType(value)
                 }
                 name="recurrence"

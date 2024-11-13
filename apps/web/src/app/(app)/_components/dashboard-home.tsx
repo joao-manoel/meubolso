@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 
 import Breadcrumb from '@/components/breadcrumb'
-import ExpensesPerCategory from '@/components/ExpensesPerCategory'
+import ExpensesPerCategory from '@/components/expenses-per-category'
 import LastTransactions from '@/components/last-transactions'
 import NavigationDate from '@/components/navigation-date'
 import SummaryCards from '@/components/summary-cards'

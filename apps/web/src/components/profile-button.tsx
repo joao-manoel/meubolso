@@ -1,5 +1,4 @@
 import { ChevronDown } from 'lucide-react'
-import Link from 'next/link'
 
 import { auth } from '@/auth/auth'
 import { getInitials } from '@/utils/format'
@@ -33,14 +32,6 @@ export default async function ProfileButton() {
         <ChevronDown className="size-4 text-muted-foreground" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px]">
-        <Separator />
-        <DropdownMenuItem asChild>
-          <Link href="/">Configuração</Link>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/">Criar organização</Link>
-        </DropdownMenuItem>
-
         <ThemeSwitcher />
         <Separator />
         <DropdownMenuItem asChild>

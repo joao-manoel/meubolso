@@ -113,7 +113,10 @@ export async function createIncomeAction(data: FormData) {
       walletId,
       title,
       amount,
-      status,
+      status:
+        recurrence === 'MONTH' || recurrence === 'YEAR' || installments
+          ? 'pending'
+          : status,
       type,
       payDate,
       ...(recurrence ? { recurrence } : { recurrence: 'VARIABLE' }),

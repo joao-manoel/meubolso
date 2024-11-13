@@ -73,43 +73,57 @@ export function TransactionPieChart({ data }: TransactionsPieChartProps) {
       (data.investmentTotalAmount / data.transactionsTotalAmount) * 100,
     ),
   }
+
+  console.log(data)
   return (
-    <Card className="flex max-h-[420px] flex-col p-6">
+    <Card className="flex h-[420px] max-h-[420px] flex-col p-6">
       <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Pie
-              data={chartData}
-              dataKey="amount"
-              nameKey="type"
-              innerRadius={70}
-            />
-          </PieChart>
-        </ChartContainer>
-        <div className="space-y-2">
-          <PercentageItem
-            icon={<TrendingUpIcon size={16} className="text-[#55b02e]" />}
-            title="Receita"
-            value={typesPercentage[TransactionType.INCOME]}
-          />
-          <PercentageItem
-            icon={<TrendingDownIcon size={16} className="text-[#e93030]" />}
-            title="Despesa"
-            value={typesPercentage[TransactionType.EXPENSE]}
-          />
-          <PercentageItem
-            icon={<PiggyBank size={16} className="text-[#ffff]" />}
-            title="Investimento"
-            value={typesPercentage[TransactionType.INVESTMENT]}
-          />
-        </div>
+        {data.incomeTotalAmount === 0 &&
+        data.expensesTotalAmount === 0 &&
+        data.investmentTotalAmount === 0 ? (
+          <div className="flex h-full items-center justify-center">
+            <p className="text-center text-sm text-muted-foreground">
+              Nennum dado dado registrado para este mês.
+            </p>
+          </div>
+        ) : (
+          <>
+            <ChartContainer
+              config={chartConfig}
+              className="mx-auto aspect-square max-h-[250px]"
+            >
+              <PieChart>
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Pie
+                  data={chartData}
+                  dataKey="amount"
+                  nameKey="type"
+                  innerRadius={70}
+                />
+              </PieChart>
+            </ChartContainer>
+            <div className="space-y-2">
+              <PercentageItem
+                icon={<TrendingUpIcon size={16} className="text-[#55b02e]" />}
+                title="Receita"
+                value={typesPercentage[TransactionType.INCOME]}
+              />
+              <PercentageItem
+                icon={<TrendingDownIcon size={16} className="text-[#e93030]" />}
+                title="Despesa"
+                value={typesPercentage[TransactionType.EXPENSE]}
+              />
+              <PercentageItem
+                icon={<PiggyBank size={16} className="text-[#ffff]" />}
+                title="Investimento"
+                value={typesPercentage[TransactionType.INVESTMENT]}
+              />
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   )

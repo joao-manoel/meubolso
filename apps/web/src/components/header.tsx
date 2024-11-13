@@ -3,6 +3,7 @@ import Image from 'next/image'
 
 import meuBolsoIcon from '@/assets/image/meu-bolso-icon.svg'
 
+import Navigation from './navigation'
 import ProfileButton from './profile-button'
 import { WalletSwitcher } from './wallet-switcher'
 export default function Header() {
@@ -21,6 +22,8 @@ export default function Header() {
           <Slash className="size-3 -rotate-[24deg] text-border" />
           { */}
           <WalletSwitcher />
+          <Slash className="size-3 -rotate-[24deg] text-border" />
+          <Navigation />
         </div>
 
         <div className="flex items-center gap-4">
