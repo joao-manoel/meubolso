@@ -18,7 +18,6 @@ export default function CreatePersonalWalletForm() {
     () => {
       router.push(`/`)
       toast.success('Carteira criada com sucesso!', {
-        description: 'Você foi direcionado para a dashboard.',
         action: {
           label: 'Dispensar',
           onClick: () => toast.dismiss(),

@@ -1,6 +1,8 @@
 'use client'
 import { AlertTriangle, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { ChangeEvent, useState } from 'react'
+import { toast } from 'sonner'
 
 import { CardBrandType } from '@/@types/cardTypes'
 import { createCardAction } from '@/actions/card-actions'
@@ -70,9 +72,19 @@ export default function CreateCardForm() {
     setCardBrand(value as CardBrandType)
   }
 
+  const router = useRouter()
+
   const [{ errors, message, success }, handleSubmit, isPending] = useFormState(
     createCardAction,
-    () => {},
+    () => {
+      router.push(`/`)
+      toast.success('Cartão criado com sucesso!', {
+        action: {
+          label: 'Dispensar',
+          onClick: () => toast.dismiss(),
+        },
+      })
+    },
   )
 
   return (
