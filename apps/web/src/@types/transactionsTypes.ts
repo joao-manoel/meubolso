@@ -12,7 +12,7 @@ export type Transactions = {
   recurrence: 'VARIABLE' | 'MONTH' | 'YEAR'
   payDate: string
   status: 'paid' | 'pending'
-  card: { id: string; name: string; icon: string }
+  card: { id: string; name: string; brand: string }
   wallet: { id: string; name: string; slug: string }
   installments: Array<{
     id: string

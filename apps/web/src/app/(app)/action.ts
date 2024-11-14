@@ -9,7 +9,7 @@ import { createTransaction } from '@/http/create-transaction'
 import { deleteTransactions } from '@/http/delete-transactions'
 import { updatePaymentTransactions } from '@/http/update-payment-transactions'
 
-const createIncomeActionSchema = z.object({
+const createTransactionActionSchema = z.object({
   title: z.string().min(3, 'Titulo tem que ter no minino 3 caracteres.'),
   amount: z
     .string()
@@ -76,8 +76,10 @@ function createInstallmentsArray(
   return installmentsArray
 }
 
-export async function createIncomeAction(data: FormData) {
-  const result = createIncomeActionSchema.safeParse(Object.fromEntries(data))
+export async function createTransactionAction(data: FormData) {
+  const result = createTransactionActionSchema.safeParse(
+    Object.fromEntries(data),
+  )
 
   if (!result.success) {
     const errors = result.error.flatten().fieldErrors

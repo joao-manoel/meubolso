@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { ReactNode } from 'react'
 
-import CreateIncomeForm from '@/app/(app)/create-transaction-form'
+import CreateIncomeForm from '@/components/create-transaction-form'
 import { getTransactionsCategorys } from '@/http/get-transactions-categorys'
 import { getWallet } from '@/http/get-wallet'
 

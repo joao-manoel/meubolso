@@ -1,11 +1,16 @@
 import { cookies } from 'next/headers'
 
 import Breadcrumb from '@/components/breadcrumb'
+import CreateCardForm from '@/components/create-card-form'
+import CreatePersonalWalletForm from '@/components/create-wallet-form'
 import ExpensesPerCategory from '@/components/expenses-per-category'
 import LastTransactions from '@/components/last-transactions'
 import NavigationDate from '@/components/navigation-date'
 import SummaryCards from '@/components/summary-cards'
 import { TransactionPieChart } from '@/components/transactions-pie-chart'
+import { Card, CardContent, CardTitle } from '@/components/ui/card'
+import { getWallet } from '@/http/get-wallet'
+import { getWallets } from '@/http/get-wallets'
 import { getTransactions } from '@/http/getTransactions'
 import { walletSummary } from '@/transaction/transactions'
 
@@ -20,8 +25,37 @@ export default async function DashboardHome({
 }: DashboardHomeProps) {
   const walletId = cookies().get('wallet')?.value
 
+  const wallets = await getWallets()
+
+  if (wallets.length < 1) {
+    return (
+      <div className="h-screen-content flex items-center justify-center">
+        <Card className="flex flex-col items-center justify-center space-y-2 p-10">
+          <CardTitle>Vamos criar sua carteira!</CardTitle>
+          <CardContent>
+            <CreatePersonalWalletForm />
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   if (!walletId) {
-    return <div>Selecione uma carteira</div>
+    return (
+      <div className="h-screen-content flex items-center justify-center">
+        <p>Selecione uma carteira.</p>
+      </div>
+    )
+  }
+
+  const wallet = await getWallet(walletId)
+
+  if (wallet.card.length < 1) {
+    return (
+      <div className="h-screen-content flex items-center justify-center">
+        <CreateCardForm />
+      </div>
+    )
   }
 
   const summary = await walletSummary({

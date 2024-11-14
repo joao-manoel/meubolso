@@ -1,5 +1,5 @@
 import {
-  IconCardType,
+  BrandCardType,
   RecurrenceType,
   TransactionStatusType,
   TransactionType,
@@ -47,7 +47,7 @@ export async function getTransactions(app: FastifyInstance) {
                 card: z.object({
                   id: z.string().uuid(),
                   name: z.string(),
-                  icon: z.nativeEnum(IconCardType),
+                  brand: z.nativeEnum(BrandCardType),
                 }),
                 wallet: z.object({
                   id: z.string().uuid(),
@@ -102,7 +102,7 @@ export async function getTransactions(app: FastifyInstance) {
               select: {
                 id: true,
                 name: true,
-                icon: true,
+                brand: true,
               },
             },
             wallet: {

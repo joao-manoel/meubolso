@@ -28,7 +28,7 @@ import { GetTransactionsCategorysResponse } from '@/http/get-transactions-catego
 import { GetWalletResponse } from '@/http/get-wallet'
 import { cn } from '@/lib/utils'
 
-import { createIncomeAction } from './action'
+import { createTransactionAction } from '../app/(app)/action'
 
 export interface CreateIncomeFormProps {
   wallet: GetWalletResponse
@@ -103,7 +103,7 @@ export default function CreateIncomeForm({
   }
 
   const [{ errors, message, success }, handleSubmit, isPending] = useFormState(
-    createIncomeAction,
+    createTransactionAction,
     () => {
       setTitle('')
       setAmount('')
@@ -325,7 +325,7 @@ export default function CreateIncomeForm({
                 {wallet.card.map((card) => (
                   <SelectItem value={card.id} key={card.id}>
                     <div className="flex gap-2">
-                      <span>{CardIcon(card.icon)}</span>
+                      <span>{CardIcon(card.brand)}</span>
                       <span>{card.name}</span>
                     </div>
                   </SelectItem>

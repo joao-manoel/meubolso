@@ -3,7 +3,7 @@ import { api } from './api-client'
 export interface CardType {
   id: string
   name: string
-  icon: string
+  brand: string
   limit: number
 }
 

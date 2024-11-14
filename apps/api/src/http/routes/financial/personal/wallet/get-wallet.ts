@@ -1,4 +1,4 @@
-import { IconCardType, WalletType } from '@prisma/client'
+import { BrandCardType, WalletType } from '@prisma/client'
 import type { FastifyInstance } from 'fastify'
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
@@ -31,7 +31,7 @@ export async function getWallet(app: FastifyInstance) {
                 z.object({
                   id: z.string().uuid(),
                   name: z.string(),
-                  icon: z.nativeEnum(IconCardType),
+                  brand: z.nativeEnum(BrandCardType),
                   limit: z.number(),
                 }),
               ),
@@ -54,7 +54,7 @@ export async function getWallet(app: FastifyInstance) {
                 select: {
                   id: true,
                   name: true,
-                  icon: true,
+                  brand: true,
                   limit: true,
                 },
               },

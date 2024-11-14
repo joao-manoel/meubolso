@@ -48,7 +48,7 @@ enum SubscriptionType {
   CANCELLED
 }
 
-enum IconCardType {
+enum BrandCardType {
   CARTEIRA
   NUBANK
   BB
@@ -193,12 +193,12 @@ model Wallet {
 }
 
 model Card {
-  id        String       @id @default(uuid())
+  id        String        @id @default(uuid())
   name      String
-  limit     Int          @default(0)
-  icon      IconCardType @default(CARTEIRA)
-  createdAt DateTime     @default(now()) @map("created_at")
-  updatedAt DateTime     @updatedAt @map("updated_at")
+  limit     Int           @default(0)
+  brand     BrandCardType @default(CARTEIRA)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
 
   wallet   Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
   walletId String @map("wallet_id")
