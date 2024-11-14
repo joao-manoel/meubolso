@@ -37,7 +37,7 @@ export async function WalletSwitcher() {
           Carteiras
         </DropdownMenuLabel>
         {wallets.map((wallet) => (
-          <DropdownMenuItem key={wallet.id}>
+          <DropdownMenuItem key={wallet.id} asChild>
             <a href={`/wallet/${wallet.id}`}>{wallet.name}</a>
           </DropdownMenuItem>
         ))}
