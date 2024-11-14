@@ -29,7 +29,7 @@ export default async function DashboardHome({
 
   if (wallets.length < 1) {
     return (
-      <div className="h-screen-content flex items-center justify-center">
+      <div className="flex h-screen-content items-center justify-center">
         <Card className="flex flex-col items-center justify-center space-y-2 p-10">
           <CardTitle>Vamos criar sua carteira!</CardTitle>
           <CardContent>
@@ -42,7 +42,7 @@ export default async function DashboardHome({
 
   if (!walletId) {
     return (
-      <div className="h-screen-content flex items-center justify-center">
+      <div className="flex h-screen-content items-center justify-center">
         <p>Selecione uma carteira.</p>
       </div>
     )
@@ -52,7 +52,7 @@ export default async function DashboardHome({
 
   if (wallet.card.length < 1) {
     return (
-      <div className="h-screen-content flex items-center justify-center">
+      <div className="flex h-screen-content items-center justify-center">
         <CreateCardForm />
       </div>
     )
